@@ -16,7 +16,7 @@ import com.moko.mkmini0232d.base.BaseActivity;
 import com.moko.mkmini0232d.databinding.ActivityGuideBinding;
 import com.moko.mkmini0232d.dialog.PermissionDialog;
 import com.moko.mkmini0232d.utils.Utils;
-import com.moko.support.remotegw20d.event.MQTTConnectionCompleteEvent;
+import com.moko.support.mini0232d.event.MQTTConnectionCompleteEvent;
 import com.permissionx.guolindev.PermissionX;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -83,7 +83,7 @@ public class GuideActivity extends BaseActivity<ActivityGuideBinding> {
 
     private void gotoMain() {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            startActivity(new Intent(this, RemoteMain20DActivity.class));
+            startActivity(new Intent(this, MainActivityMiNi0232D.class));
             finish();
         }, 1000);
     }

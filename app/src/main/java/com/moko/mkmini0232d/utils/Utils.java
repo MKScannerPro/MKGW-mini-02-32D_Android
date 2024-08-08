@@ -13,7 +13,7 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 
 import com.moko.mkmini0232d.BuildConfig;
-import com.moko.mkmini0232d.activity.RemoteMain20DActivity;
+import com.moko.mkmini0232d.activity.MainActivityMiNi0232D;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class Utils {
 
 
     public static File getFile(String fileName) {
-        String devicePath = RemoteMain20DActivity.PATH_LOGCAT + File.separator + fileName;
+        String devicePath = MainActivityMiNi0232D.PATH_LOGCAT + File.separator + fileName;
         File deviceListFile = new File(devicePath);
         if (!deviceListFile.exists()) {
             try {
@@ -61,7 +61,7 @@ public class Utils {
                 if (BuildConfig.IS_LIBRARY) {
                     uri = FileProvider.getUriForFile(context, "com.moko.mkscannerpro.fileprovider", files[0]);
                 } else {
-                    uri = FileProvider.getUriForFile(context, "com.moko.mkremotegw.fileprovider", files[0]);
+                    uri = FileProvider.getUriForFile(context, "com.moko.mkmini0232d.fileprovider", files[0]);
                 }
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             } else {

@@ -23,15 +23,11 @@ public class PasswordRemoteBleDialog extends MokoBaseDialog<DialogPasswordRemote
 
     @Override
     protected void onCreateView() {
-        InputFilter filter = new InputFilter() {
-            @Override
-            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-                if (!(source + "").matches(FILTER_ASCII)) {
-                    return "";
-                }
-
-                return null;
+        InputFilter filter = (source, start, end, dest, dstart, dend) -> {
+            if (!(source + "").matches(FILTER_ASCII)) {
+                return "";
             }
+            return null;
         };
         mBind.etPassword.setFilters(new InputFilter[]{new InputFilter.LengthFilter(16), filter});
 

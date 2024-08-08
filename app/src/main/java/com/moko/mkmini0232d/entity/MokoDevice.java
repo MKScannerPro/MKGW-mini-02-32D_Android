@@ -4,7 +4,6 @@ package com.moko.mkmini0232d.entity;
 import java.io.Serializable;
 
 public class MokoDevice implements Serializable {
-
     public int id;
     public String name;
     public String mac;
