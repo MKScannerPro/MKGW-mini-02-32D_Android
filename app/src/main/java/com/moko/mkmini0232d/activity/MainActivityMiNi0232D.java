@@ -24,7 +24,6 @@ import com.moko.mkmini0232d.activity.set.ModifySettingsActivity;
 import com.moko.mkmini0232d.adapter.DeviceAdapter;
 import com.moko.mkmini0232d.base.BaseActivity;
 import com.moko.mkmini0232d.databinding.ActivityMainMini0232dBinding;
-import com.moko.mkmini0232d.databinding.ActivityMainRemote20dBinding;
 import com.moko.mkmini0232d.db.DBTools;
 import com.moko.mkmini0232d.dialog.AlertMessageDialog;
 import com.moko.mkmini0232d.entity.MQTTConfig;

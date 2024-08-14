@@ -10,12 +10,12 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.moko.mkmini0232d.databinding.FragmentUserApp20dBinding;
+import com.moko.mkmini0232d.databinding.FragmentUserAppMini0232dBinding;
 
 public class UserFragment extends Fragment {
     private final String FILTER_ASCII = "[ -~]*";
     private static final String TAG = UserFragment.class.getSimpleName();
-    private FragmentUserApp20dBinding mBind;
+    private FragmentUserAppMini0232dBinding mBind;
     private String username;
     private String password;
 
@@ -35,7 +35,7 @@ public class UserFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        mBind = FragmentUserApp20dBinding.inflate(inflater, container, false);
+        mBind = FragmentUserAppMini0232dBinding.inflate(inflater, container, false);
         InputFilter filter = (source, start, end, dest, dstart, dend) -> {
             if (!(source + "").matches(FILTER_ASCII)) {
                 return "";

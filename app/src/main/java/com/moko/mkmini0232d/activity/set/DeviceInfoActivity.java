@@ -81,7 +81,8 @@ public class DeviceInfoActivity extends BaseActivity<ActivityDeviceInfoMini0232d
             mBind.tvDeviceHardwareVersion.setText(result.data.get("hardware_version").getAsString());
             mBind.tvDeviceSoftwareVersion.setText(result.data.get("software_version").getAsString());
             mBind.tvWifiFirmwareVersion.setText(result.data.get("firmware_version").getAsString());
-            mBind.tvBtFirmwareVersion.setText(result.data.get("slave_firmware_version").getAsString());
+            // TODO: 2024/8/14  固件在下个版本加上蓝牙固件版本
+//            mBind.tvBtFirmwareVersion.setText(result.data.get("slave_firmware_version").getAsString());
             mBind.tvWifiMac.setText(result.data.get("wifi_mac").getAsString().toUpperCase());
             mBind.tvBtMac.setText(result.data.get("ble_mac").getAsString().toUpperCase());
         }
