@@ -101,6 +101,7 @@ public class AdvertiseIBeaconActivity extends BaseActivity<ActivityAdvertiseIbea
             dialog.show(getSupportFragmentManager());
         });
         mBind.cbIBeacon.setOnCheckedChangeListener((buttonView, isChecked) -> mBind.layoutAdvertise.setVisibility(isChecked ? View.VISIBLE : View.GONE));
+        mBind.sbRssiFilter.setOnSeekBarChangeListener(this);
     }
 
     private void getBeaconParams() {
