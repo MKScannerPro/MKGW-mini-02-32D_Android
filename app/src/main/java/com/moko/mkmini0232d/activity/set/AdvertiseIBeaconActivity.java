@@ -1,9 +1,11 @@
 package com.moko.mkmini0232d.activity.set;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.SeekBar;
 
 import com.elvishew.xlog.XLog;
 import com.google.gson.Gson;
@@ -48,15 +50,10 @@ import java.util.List;
  * @date: 2023/7/3 11:24
  * @des:
  */
-public class AdvertiseIBeaconActivity extends BaseActivity<ActivityAdvertiseIbeaconMini0232dBinding> {
+public class AdvertiseIBeaconActivity extends BaseActivity<ActivityAdvertiseIbeaconMini0232dBinding> implements SeekBar.OnSeekBarChangeListener {
     private final String[] txPowerArr = {"-24dBm", "-21dBm", "-18dBm", "-15dBm", "-12dBm", "-9dBm", "-6dBm", "-3dBm", "0dBm", "3dBm", "6dBm",
             "9dBm", "12dBm", "15dBm", "18dBm", "21dBm"};
     private int mSelected;
-    private boolean isIBeaconEnableSuc;
-    private boolean isIBeaconMajorSuc;
-    private boolean isIBeaconMinorSuc;
-    private boolean isIBeaconUuidSuc;
-    private boolean isIBeaconIntervalSuc;
     private MokoDevice mMokoDevice;
     private MQTTConfig appMqttConfig;
     private String mAppTopic;
@@ -65,6 +62,7 @@ public class AdvertiseIBeaconActivity extends BaseActivity<ActivityAdvertiseIbea
     private int minor;
     private String uuid;
     private int advInterval;
+    private boolean saveParamsError;
 
     @Override
     protected ActivityAdvertiseIbeaconMini0232dBinding getViewBinding() {
@@ -82,13 +80,14 @@ public class AdvertiseIBeaconActivity extends BaseActivity<ActivityAdvertiseIbea
             getBeaconParams();
         } else {
             showLoadingProgressDialog();
-            List<OrderTask> orderTasks = new ArrayList<>(6);
+            List<OrderTask> orderTasks = new ArrayList<>(8);
             orderTasks.add(OrderTaskAssembler.getIBeaconEnable());
             orderTasks.add(OrderTaskAssembler.getIBeaconMajor());
             orderTasks.add(OrderTaskAssembler.getIBeaconMinor());
             orderTasks.add(OrderTaskAssembler.getIBeaconUUid());
             orderTasks.add(OrderTaskAssembler.getIBeaconAdInterval());
             orderTasks.add(OrderTaskAssembler.getIBeaconTxPower());
+            orderTasks.add(OrderTaskAssembler.getIBeaconRssi1M());
             MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
         }
         mBind.tvTxPowerVal.setOnClickListener(v -> {
@@ -157,6 +156,8 @@ public class AdvertiseIBeaconActivity extends BaseActivity<ActivityAdvertiseIbea
             mBind.etAdInterval.setSelection(mBind.etAdInterval.getText().length());
             mSelected = result.data.get("tx_power").getAsInt();
             mBind.tvTxPowerVal.setText(txPowerArr[mSelected]);
+            int progress = result.data.get("rssi_1m").getAsInt();
+            mBind.sbRssiFilter.setProgress(progress + 100);
         }
         if (msg_id == MQTTConstants.CONFIG_MSG_ID_BEACON_PARAMS) {
             Type type = new TypeToken<MsgConfigResult<?>>() {
@@ -214,29 +215,20 @@ public class AdvertiseIBeaconActivity extends BaseActivity<ActivityAdvertiseIbea
                                         } else {
                                             ToastUtils.showToast(this, "Setup failed！");
                                         }
-                                    } else {
-                                        isIBeaconEnableSuc = result == 1;
                                     }
                                     break;
 
                                 case KEY_I_BEACON_MAJOR:
-                                    isIBeaconMajorSuc = result == 1;
-                                    break;
-
                                 case KEY_I_BEACON_MINOR:
-                                    isIBeaconMinorSuc = result == 1;
-                                    break;
-
                                 case KEY_I_BEACON_UUID:
-                                    isIBeaconUuidSuc = result == 1;
-                                    break;
-
                                 case KEY_I_BEACON_AD_INTERVAL:
-                                    isIBeaconIntervalSuc = result == 1;
+                                case KEY_I_BEACON_RSSI1M:
+                                    saveParamsError = result != 1;
                                     break;
 
                                 case KEY_I_BEACON_TX_POWER:
-                                    if (isIBeaconEnableSuc && isIBeaconMajorSuc && isIBeaconMinorSuc && isIBeaconUuidSuc && isIBeaconIntervalSuc && result == 1) {
+                                    saveParamsError = result != 1;
+                                    if (!saveParamsError) {
                                         ToastUtils.showToast(this, "Setup succeed！");
                                     } else {
                                         ToastUtils.showToast(this, "Setup failed！");
@@ -294,6 +286,11 @@ public class AdvertiseIBeaconActivity extends BaseActivity<ActivityAdvertiseIbea
                                         mBind.tvTxPowerVal.setText(txPowerArr[mSelected]);
                                     }
                                     break;
+
+                                case KEY_I_BEACON_RSSI1M:
+                                    int progress = value[4] + 100;
+                                    mBind.sbRssiFilter.setProgress(progress);
+                                    break;
                             }
                         }
                     }
@@ -311,6 +308,7 @@ public class AdvertiseIBeaconActivity extends BaseActivity<ActivityAdvertiseIbea
             } else {
                 if (isValid()) {
                     showLoadingProgressDialog();
+                    saveParamsError = false;
                     List<OrderTask> orderTasks = new ArrayList<>(8);
                     orderTasks.add(OrderTaskAssembler.setIBeaconEnable(1));
                     int major = Integer.parseInt(mBind.etMajor.getText().toString());
@@ -321,6 +319,7 @@ public class AdvertiseIBeaconActivity extends BaseActivity<ActivityAdvertiseIbea
                     orderTasks.add(OrderTaskAssembler.setIBeaconMinor(minor));
                     orderTasks.add(OrderTaskAssembler.setIBeaconUuid(uuid));
                     orderTasks.add(OrderTaskAssembler.setIBeaconAdInterval(interval));
+                    orderTasks.add(OrderTaskAssembler.setIBeaconRssi1M(mBind.sbRssiFilter.getProgress() - 100));
                     orderTasks.add(OrderTaskAssembler.setIBeaconTxPower(mSelected));
                     MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[0]));
                 } else {
@@ -364,6 +363,7 @@ public class AdvertiseIBeaconActivity extends BaseActivity<ActivityAdvertiseIbea
         jsonObject.addProperty("minor", minor);
         jsonObject.addProperty("uuid", uuid);
         jsonObject.addProperty("adv_interval", advInterval);
+        jsonObject.addProperty("rssi_1m", mBind.sbRssiFilter.getProgress() - 100);
         jsonObject.addProperty("tx_power", mSelected);
         String message = assembleWriteCommonData(msgId, mMokoDevice.mac, jsonObject);
         try {
@@ -389,5 +389,22 @@ public class AdvertiseIBeaconActivity extends BaseActivity<ActivityAdvertiseIbea
 
     public void onBack(View view) {
         finish();
+    }
+
+    @SuppressLint("DefaultLocale")
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        int rssi = progress - 100;
+        mBind.tvRssiFilterValue.setText(String.format("%ddBm", rssi));
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
 }

@@ -260,7 +260,7 @@ public class ModifyWifiSettingsActivity extends BaseActivity<ActivityModifyWifiS
     public void onSelectSecurity(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas((ArrayList<String>) Arrays.asList(mSecurityValues), mSecuritySelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mSecurityValues)), mSecuritySelected);
         dialog.setListener(value -> {
             mSecuritySelected = value;
             mBind.tvSecurity.setText(mSecurityValues[value]);
@@ -294,7 +294,7 @@ public class ModifyWifiSettingsActivity extends BaseActivity<ActivityModifyWifiS
     public void onSelectEAPType(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas((ArrayList<String>) Arrays.asList(mEAPTypeValues), mEAPTypeSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mEAPTypeValues)), mEAPTypeSelected);
         dialog.setListener(value -> {
             mEAPTypeSelected = value;
             mBind.tvEapType.setText(mEAPTypeValues[value]);

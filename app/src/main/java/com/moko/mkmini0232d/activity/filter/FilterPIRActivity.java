@@ -236,7 +236,7 @@ public class FilterPIRActivity extends BaseActivity<ActivityFilterPirMini0232dBi
     public void onDelayRespStatus(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas((ArrayList<String>) Arrays.asList(mDelayRespStatusValues), mDelayRespStatusSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mDelayRespStatusValues)), mDelayRespStatusSelected);
         dialog.setListener(value -> {
             mDelayRespStatusSelected = value;
             mBind.tvDelayRespStatus.setText(mDelayRespStatusValues[value]);
@@ -247,7 +247,7 @@ public class FilterPIRActivity extends BaseActivity<ActivityFilterPirMini0232dBi
     public void onDoorStatus(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas((ArrayList<String>) Arrays.asList(mDoorStatusValues), mDoorStatusSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mDoorStatusValues)), mDoorStatusSelected);
         dialog.setListener(value -> {
             mDoorStatusSelected = value;
             mBind.tvDoorStatus.setText(mDoorStatusValues[value]);
@@ -258,7 +258,7 @@ public class FilterPIRActivity extends BaseActivity<ActivityFilterPirMini0232dBi
     public void onSensorSensitivity(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas((ArrayList<String>) Arrays.asList(mSensorSensitivityValues), mSensorSensitivitySelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mSensorSensitivityValues)), mSensorSensitivitySelected);
         dialog.setListener(value -> {
             mSensorSensitivitySelected = value;
             mBind.tvSensorSensitivity.setText(mSensorSensitivityValues[value]);
@@ -269,7 +269,7 @@ public class FilterPIRActivity extends BaseActivity<ActivityFilterPirMini0232dBi
     public void onDetectionStatus(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas((ArrayList<String>) Arrays.asList(mDetectionStatusValues), mDetectionStatusSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mDetectionStatusValues)), mDetectionStatusSelected);
         dialog.setListener(value -> {
             mDetectionStatusSelected = value;
             mBind.tvDetectionStatus.setText(mDetectionStatusValues[value]);

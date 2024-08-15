@@ -196,6 +196,63 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tvAdInterval" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/tvAdInterval"
+            android:layout_marginTop="10dp"
+            android:id="@+id/layoutRssi">
+
+            <TextView
+                android:id="@+id/rssi_1m"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RSSI@1m"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toTopOf="@id/sb_rssi_filter"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:text="(-100dBm~0dBm)"
+                android:textColor="@color/grey_b3b3b3"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@id/sb_rssi_filter"
+                app:layout_constraintLeft_toRightOf="@id/rssi_1m" />
+
+            <SeekBar
+                android:id="@+id/sb_rssi_filter"
+                style="@style/CustomSeekbarStyle"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="30dp"
+                android:max="100"
+                android:maxHeight="2dp"
+                android:minHeight="2dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:progress="59"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/tv_rssi_filter_value"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_rssi_filter_value"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:text="-59dBm"
+                android:textColor="@color/black_333333"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="@id/sb_rssi_filter"
+                app:layout_constraintLeft_toRightOf="@id/sb_rssi_filter"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@id/sb_rssi_filter" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <TextView
             android:id="@+id/tvTxPower"
             android:layout_width="wrap_content"
@@ -206,7 +263,7 @@
             android:textColor="@color/black_333333"
             android:textSize="15sp"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvAdInterval" />
+            app:layout_constraintTop_toBottomOf="@+id/layoutRssi" />
 
         <TextView
             android:id="@+id/tvTxPowerVal"

@@ -69,6 +69,7 @@ public enum ParamsKeyEnum implements Serializable {
     KEY_I_BEACON_UUID(0x73),
     KEY_I_BEACON_AD_INTERVAL(0x74),
     KEY_I_BEACON_TX_POWER(0x75),
+    KEY_I_BEACON_RSSI1M(0x76),
     ;
 
     private final int paramsKey;

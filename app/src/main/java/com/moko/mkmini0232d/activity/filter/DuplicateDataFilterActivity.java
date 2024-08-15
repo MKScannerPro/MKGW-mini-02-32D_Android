@@ -58,7 +58,7 @@ public class DuplicateDataFilterActivity extends BaseActivity<ActivityDuplicateD
         getDuplicateDataFilter();
         mBind.tvFilterStrategy.setOnClickListener(v -> {
             BottomDialog dialog = new BottomDialog();
-            dialog.setDatas((ArrayList<String>) Arrays.asList(strategyValues), strategySelected);
+            dialog.setDatas(new ArrayList<>(Arrays.asList(strategyValues)), strategySelected);
             dialog.setListener(value -> {
                 strategySelected = value;
                 mBind.tvFilterStrategy.setText(strategyValues[value]);
@@ -152,7 +152,7 @@ public class DuplicateDataFilterActivity extends BaseActivity<ActivityDuplicateD
 
     public void onFilterBy(View view) {
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas((ArrayList<String>) Arrays.asList(mValues), mSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mValues)), mSelected);
         dialog.setListener(value -> {
             mSelected = value;
             mBind.tvFilerBy.setText(mValues[value]);

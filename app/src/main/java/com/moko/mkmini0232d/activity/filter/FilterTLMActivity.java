@@ -146,7 +146,7 @@ public class FilterTLMActivity extends BaseActivity<ActivityFilterTlmMini0232dBi
     public void onTLMVersion(View view) {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas((ArrayList<String>) Arrays.asList(mValues), mSelected);
+        dialog.setDatas(new ArrayList<>(Arrays.asList(mValues)), mSelected);
         dialog.setListener(value -> {
             mSelected = value;
             mBind.tvTlmVersion.setText(mValues[value]);

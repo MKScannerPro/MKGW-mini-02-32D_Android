@@ -921,4 +921,14 @@ public class ParamsTask extends OrderTask {
                 (byte) txPower
         };
     }
+
+    public void setIBeaconRssi1M(@IntRange(from = -100, to = 0) int rssi1M) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_I_BEACON_RSSI1M.getParamsKey(),
+                (byte) 0x01,
+                (byte) rssi1M
+        };
+    }
 }

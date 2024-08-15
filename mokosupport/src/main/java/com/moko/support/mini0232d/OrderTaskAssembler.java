@@ -68,6 +68,7 @@ public class OrderTaskAssembler {
         GetFirmwareRevisionTask task = new GetFirmwareRevisionTask();
         return task;
     }
+
     public static OrderTask getBleMac() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.KEY_BLE_MAC);
@@ -79,6 +80,7 @@ public class OrderTaskAssembler {
         task.setData(ParamsKeyEnum.KEY_WIFI_FIRMWARE_VERSION);
         return task;
     }
+
     public static OrderTask getWifiMac() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.KEY_WIFI_MAC);
@@ -365,6 +367,12 @@ public class OrderTaskAssembler {
     public static OrderTask getIBeaconTxPower() {
         ParamsTask task = new ParamsTask();
         task.setData(ParamsKeyEnum.KEY_I_BEACON_TX_POWER);
+        return task;
+    }
+
+    public static OrderTask getIBeaconRssi1M() {
+        ParamsTask task = new ParamsTask();
+        task.setData(ParamsKeyEnum.KEY_I_BEACON_RSSI1M);
         return task;
     }
 
@@ -744,6 +752,12 @@ public class OrderTaskAssembler {
     public static OrderTask setIBeaconTxPower(@IntRange(from = 0, to = 15) int txPower) {
         ParamsTask task = new ParamsTask();
         task.setIBeaconTxPower(txPower);
+        return task;
+    }
+
+    public static OrderTask setIBeaconRssi1M(@IntRange(from = -100, to = 0) int rssi1M) {
+        ParamsTask task = new ParamsTask();
+        task.setIBeaconRssi1M(rssi1M);
         return task;
     }
 }
