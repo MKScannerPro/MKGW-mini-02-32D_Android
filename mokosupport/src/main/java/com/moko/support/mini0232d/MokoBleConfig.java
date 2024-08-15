@@ -46,7 +46,7 @@ final class MokoBleConfig extends MokoBleManager {
 
     @Override
     public void init() {
-        requestMtu(247).with(((device, mtu) -> {
+        requestMtu(240).with(((device, mtu) -> {
         })).then((device -> {
             enablePasswordNotify();
             enableDisconnectedNotify();

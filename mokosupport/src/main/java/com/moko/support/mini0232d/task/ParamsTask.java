@@ -629,7 +629,7 @@ public class ParamsTask extends OrderTask {
         }
         remainPack = packetCount - 1;
         packetIndex = 0;
-        delayTime = DEFAULT_DELAY_TIME + 500 * packetCount;
+        delayTime = DEFAULT_DELAY_TIME + 500L * packetCount;
         if (packetCount > 1) {
             data = new byte[DATA_LENGTH_MAX + 6];
             data[0] = (byte) 0xEE;
@@ -653,6 +653,7 @@ public class ParamsTask extends OrderTask {
                 data[i + 6] = dataBytes[i];
             }
         }
+        inputSteam.close();
     }
 
     public void setFilterNameRules(ArrayList<String> filterNameRules) {
@@ -685,7 +686,7 @@ public class ParamsTask extends OrderTask {
         }
         remainPack = packetCount - 1;
         packetIndex = 0;
-        delayTime = DEFAULT_DELAY_TIME + 500 * packetCount;
+        delayTime = DEFAULT_DELAY_TIME + 500L * packetCount;
         if (packetCount > 1) {
             data = new byte[DATA_LENGTH_MAX + 6];
             data[0] = (byte) 0xEE;
@@ -725,7 +726,7 @@ public class ParamsTask extends OrderTask {
         }
         remainPack = packetCount - 1;
         packetIndex = 0;
-        delayTime = DEFAULT_DELAY_TIME + 500 * packetCount;
+        delayTime = DEFAULT_DELAY_TIME + 500L * packetCount;
         if (packetCount > 1) {
             data = new byte[DATA_LENGTH_MAX + 6];
             data[0] = (byte) 0xEE;
@@ -758,7 +759,7 @@ public class ParamsTask extends OrderTask {
     private int dataOrigin;
     private byte[] dataBytes;
     private String dataBytesStr = "";
-    private static final int DATA_LENGTH_MAX = 238;
+    private static final int DATA_LENGTH_MAX = 230;
 
     @Override
     public boolean parseValue(byte[] value) {
