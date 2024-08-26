@@ -26,6 +26,8 @@ public class DeviceInformationActivity extends BaseActivity<ActivityDeviceInfoMi
 
     @Override
     protected void onCreate() {
+        mBind.layoutBTFirmware.setVisibility(View.GONE);
+        mBind.lineBTFirmware.setVisibility(View.GONE);
         showLoadingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>(10);
         orderTasks.add(OrderTaskAssembler.getDeviceName());
@@ -35,7 +37,6 @@ public class DeviceInformationActivity extends BaseActivity<ActivityDeviceInfoMi
         orderTasks.add(OrderTaskAssembler.getWifiSoftwareVersion());
         orderTasks.add(OrderTaskAssembler.getWifiFirmwareVersion());
         orderTasks.add(OrderTaskAssembler.getWifiMac());
-        orderTasks.add(OrderTaskAssembler.getBleFirmwareVersion());
         orderTasks.add(OrderTaskAssembler.getBleMac());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
@@ -75,9 +76,6 @@ public class DeviceInformationActivity extends BaseActivity<ActivityDeviceInfoMi
                     break;
                 case CHAR_HARDWARE_REVISION:
                     mBind.tvDeviceHardwareVersion.setText(new String(value));
-                    break;
-                case CHAR_FIRMWARE_REVISION:
-                    mBind.tvBtFirmwareVersion.setText(new String(value));
                     break;
                 case CHAR_PARAMS:
                     if (value.length >= 4) {

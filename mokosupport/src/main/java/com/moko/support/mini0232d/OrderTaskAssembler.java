@@ -64,10 +64,10 @@ public class OrderTaskAssembler {
 //        return task;
 //    }
 
-    public static OrderTask getBleFirmwareVersion() {
-        GetFirmwareRevisionTask task = new GetFirmwareRevisionTask();
-        return task;
-    }
+//    public static OrderTask getBleFirmwareVersion() {
+//        GetFirmwareRevisionTask task = new GetFirmwareRevisionTask();
+//        return task;
+//    }
 
     public static OrderTask getBleMac() {
         ParamsTask task = new ParamsTask();
