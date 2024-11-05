@@ -12,7 +12,9 @@ import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
+import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.mkmini0232d.AppConstants;
+import com.moko.mkmini0232d.R;
 import com.moko.mkmini0232d.base.BaseActivity;
 import com.moko.mkmini0232d.databinding.ActivityWifiSettingsMimi0232dBinding;
 import com.moko.mkmini0232d.dialog.BottomDialog;
@@ -31,6 +33,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class WifiSettingsActivity extends BaseActivity<ActivityWifiSettingsMimi0232dBinding> {
     private final String FILTER_ASCII = "[ -~]*";
@@ -44,6 +49,12 @@ public class WifiSettingsActivity extends BaseActivity<ActivityWifiSettingsMimi0
     private String mCertPath;
     private String mKeyPath;
     private int requestCode;
+    private boolean wifiDhcpEnable;
+    private String wifiIp;
+    private String wifiMask;
+    private String wifiGateway;
+    private String wifiDns;
+    private Pattern pattern;
 
     @Override
     protected void onCreate() {
@@ -57,13 +68,15 @@ public class WifiSettingsActivity extends BaseActivity<ActivityWifiSettingsMimi0
             }
             return null;
         };
+        String IP_REGEX = "((25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))\\.){3}(25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))*";
+        pattern = Pattern.compile(IP_REGEX);
         mBind.etUsername.setFilters(new InputFilter[]{new InputFilter.LengthFilter(32), filter});
         mBind.etPassword.setFilters(new InputFilter[]{new InputFilter.LengthFilter(64), filter});
         mBind.etEapPassword.setFilters(new InputFilter[]{new InputFilter.LengthFilter(64), filter});
         mBind.etSsid.setFilters(new InputFilter[]{new InputFilter.LengthFilter(32), filter});
         mBind.etDomainId.setFilters(new InputFilter[]{new InputFilter.LengthFilter(64), filter});
         showLoadingProgressDialog();
-        List<OrderTask> orderTasks = new ArrayList<>(8);
+        List<OrderTask> orderTasks = new ArrayList<>(10);
         orderTasks.add(OrderTaskAssembler.getWifiSecurityType());
         orderTasks.add(OrderTaskAssembler.getWifiSSID());
         orderTasks.add(OrderTaskAssembler.getWifiPassword());
@@ -72,7 +85,14 @@ public class WifiSettingsActivity extends BaseActivity<ActivityWifiSettingsMimi0
         orderTasks.add(OrderTaskAssembler.getWifiEapPassword());
         orderTasks.add(OrderTaskAssembler.getWifiEapDomainId());
         orderTasks.add(OrderTaskAssembler.getWifiEapVerifyServiceEnable());
+        orderTasks.add(OrderTaskAssembler.getNetworkDHCP());
+        orderTasks.add(OrderTaskAssembler.getNetworkIPInfo());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+
+        mBind.layoutIp.imgDhcp.setOnClickListener(v -> {
+            wifiDhcpEnable = !wifiDhcpEnable;
+            setDhcpEnable(wifiDhcpEnable);
+        });
     }
 
     @Override
@@ -142,6 +162,8 @@ public class WifiSettingsActivity extends BaseActivity<ActivityWifiSettingsMimi0
                                 case KEY_WIFI_EAP_DOMAIN_ID:
                                 case KEY_WIFI_EAP_VERIFY_SERVICE_ENABLE:
                                 case KEY_WIFI_PASSWORD:
+                                case KEY_NETWORK_IP_INFO:
+                                case KEY_NETWORK_DHCP:
                                     if (result != 1) {
                                         mSavedParamsError = true;
                                     }
@@ -222,12 +244,43 @@ public class WifiSettingsActivity extends BaseActivity<ActivityWifiSettingsMimi0
                                     if (mSecuritySelected != 0 && mEAPTypeSelected != 2)
                                         mBind.llCa.setVisibility(mBind.cbVerifyServer.isChecked() ? View.VISIBLE : View.GONE);
                                     break;
+
+                                case KEY_NETWORK_DHCP:
+                                    wifiDhcpEnable = (value[4] & 0xff) == 1;
+                                    setDhcpEnable(wifiDhcpEnable);
+                                    break;
+
+                                case KEY_NETWORK_IP_INFO:
+                                    if (length == 16) {
+                                        wifiIp = String.format(Locale.getDefault(), "%d.%d.%d.%d",
+                                                value[4] & 0xFF, value[5] & 0xFF, value[6] & 0xFF, value[7] & 0xFF);
+                                        wifiMask = String.format(Locale.getDefault(), "%d.%d.%d.%d",
+                                                value[8] & 0xFF, value[9] & 0xFF, value[10] & 0xFF, value[11] & 0xFF);
+                                        wifiGateway = String.format(Locale.getDefault(), "%d.%d.%d.%d",
+                                                value[12] & 0xFF, value[13] & 0xFF, value[14] & 0xFF, value[15] & 0xFF);
+                                        wifiDns = String.format(Locale.getDefault(), "%d.%d.%d.%d",
+                                                value[16] & 0xFF, value[17] & 0xFF, value[18] & 0xFF, value[19] & 0xFF);
+                                    }
+                                    setIpInfo();
+                                    break;
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    private void setDhcpEnable(boolean enable) {
+        mBind.layoutIp.imgDhcp.setImageResource(enable ? R.drawable.checkbox_open : R.drawable.checkbox_close);
+        mBind.layoutIp.clIp.setVisibility(enable ? View.GONE : View.VISIBLE);
+    }
+
+    private void setIpInfo() {
+        mBind.layoutIp.etIp.setText(wifiIp);
+        mBind.layoutIp.etMask.setText(wifiMask);
+        mBind.layoutIp.etGateway.setText(wifiGateway);
+        mBind.layoutIp.etDns.setText(wifiDns);
     }
 
     public void onSelectSecurity(View view) {
@@ -348,6 +401,26 @@ public class WifiSettingsActivity extends BaseActivity<ActivityWifiSettingsMimi0
                 return TextUtils.isEmpty(mCaPath) || TextUtils.isEmpty(mCertPath) || TextUtils.isEmpty(mKeyPath);
             }
         }
+        if (!wifiDhcpEnable) {
+            //检查ip地址是否合法
+            String ip = mBind.layoutIp.etIp.getText().toString();
+            String mask = mBind.layoutIp.etMask.getText().toString();
+            String gateway = mBind.layoutIp.etGateway.getText().toString();
+            String dns = mBind.layoutIp.etDns.getText().toString();
+            Matcher matcherIp = pattern.matcher(ip);
+            Matcher matcherMask = pattern.matcher(mask);
+            Matcher matcherGateway = pattern.matcher(gateway);
+            Matcher matcherDns = pattern.matcher(dns);
+            if (!matcherIp.matches()
+                    || !matcherMask.matches()
+                    || !matcherGateway.matches()
+                    || !matcherDns.matches())
+                return true;
+            wifiIp = ip;
+            wifiMask = mask;
+            wifiGateway = gateway;
+            wifiDns = dns;
+        }
         return false;
     }
 
@@ -382,11 +455,48 @@ public class WifiSettingsActivity extends BaseActivity<ActivityWifiSettingsMimi0
                     orderTasks.add(OrderTaskAssembler.setWifiClientKey(new File(mKeyPath)));
                 }
             }
+            if (!wifiDhcpEnable) {
+                String[] ipInfo = getIpInfo();
+                orderTasks.add(OrderTaskAssembler.setNetworkIPInfo(ipInfo[0], ipInfo[1], ipInfo[2], ipInfo[3]));
+            }
+            orderTasks.add(OrderTaskAssembler.setNetworkDHCP(wifiDhcpEnable ? 1 : 0));
             orderTasks.add(OrderTaskAssembler.setWifiEapType(mEAPTypeSelected));
             MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         } catch (Exception e) {
             ToastUtils.showToast(this, "File is missing");
         }
+    }
+
+    private String[] getIpInfo() {
+        String ip = mBind.layoutIp.etIp.getText().toString();
+        String mask = mBind.layoutIp.etMask.getText().toString();
+        String gateway = mBind.layoutIp.etGateway.getText().toString();
+        String dns = mBind.layoutIp.etDns.getText().toString();
+        String[] ipArray = ip.split("\\.");
+        String ipHex = String.format("%s%s%s%s",
+                MokoUtils.int2HexString(Integer.parseInt(ipArray[0])),
+                MokoUtils.int2HexString(Integer.parseInt(ipArray[1])),
+                MokoUtils.int2HexString(Integer.parseInt(ipArray[2])),
+                MokoUtils.int2HexString(Integer.parseInt(ipArray[3])));
+        String[] maskArray = mask.split("\\.");
+        String maskHex = String.format("%s%s%s%s",
+                MokoUtils.int2HexString(Integer.parseInt(maskArray[0])),
+                MokoUtils.int2HexString(Integer.parseInt(maskArray[1])),
+                MokoUtils.int2HexString(Integer.parseInt(maskArray[2])),
+                MokoUtils.int2HexString(Integer.parseInt(maskArray[3])));
+        String[] gatewayArray = gateway.split("\\.");
+        String gatewayHex = String.format("%s%s%s%s",
+                MokoUtils.int2HexString(Integer.parseInt(gatewayArray[0])),
+                MokoUtils.int2HexString(Integer.parseInt(gatewayArray[1])),
+                MokoUtils.int2HexString(Integer.parseInt(gatewayArray[2])),
+                MokoUtils.int2HexString(Integer.parseInt(gatewayArray[3])));
+        String[] dnsArray = dns.split("\\.");
+        String dnsHex = String.format("%s%s%s%s",
+                MokoUtils.int2HexString(Integer.parseInt(dnsArray[0])),
+                MokoUtils.int2HexString(Integer.parseInt(dnsArray[1])),
+                MokoUtils.int2HexString(Integer.parseInt(dnsArray[2])),
+                MokoUtils.int2HexString(Integer.parseInt(dnsArray[3])));
+        return new String[]{ipHex, maskHex, gatewayHex, dnsHex};
     }
 
     @Override
