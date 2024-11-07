@@ -421,6 +421,12 @@
                     app:layout_constraintWidth_percent="0.57" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <include
+                android:id="@+id/layoutIp"
+                layout="@layout/layout_dhcp_info_mini02_32d"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/cl_key" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>
