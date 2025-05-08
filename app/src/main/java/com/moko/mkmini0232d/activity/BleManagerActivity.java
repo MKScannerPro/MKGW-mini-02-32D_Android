@@ -19,22 +19,22 @@ import com.moko.mkmini0232d.adapter.BleDeviceAdapter;
 import com.moko.mkmini0232d.base.BaseActivity;
 import com.moko.mkmini0232d.databinding.ActivityBleDevicesMini0232dBinding;
 import com.moko.mkmini0232d.db.DBTools;
-import com.moko.mkmini0232d.dialog.PasswordRemoteBleDialog;
-import com.moko.mkmini0232d.dialog.ScanFilterDialog;
+import com.moko.lib.scannerui.dialog.PasswordBleDialog;
+import com.moko.lib.scannerui.dialog.ScanFilterDialog;
 import com.moko.mkmini0232d.entity.MQTTConfig;
 import com.moko.mkmini0232d.entity.MokoDevice;
 import com.moko.mkmini0232d.utils.SPUtiles;
-import com.moko.mkmini0232d.utils.ToastUtils;
+import com.moko.lib.scannerui.utils.ToastUtils;
 import com.moko.support.mini0232d.MQTTConstants;
-import com.moko.support.mini0232d.MQTTSupport;
+import com.moko.lib.mqtt.MQTTSupport;
 import com.moko.support.mini0232d.MokoSupport;
 import com.moko.support.mini0232d.entity.BXPButtonInfo;
 import com.moko.support.mini0232d.entity.BleDevice;
-import com.moko.support.mini0232d.entity.MsgNotify;
+import com.moko.lib.mqtt.entity.MsgNotify;
 import com.moko.support.mini0232d.entity.OtherDeviceInfo;
-import com.moko.support.mini0232d.event.DeviceModifyNameEvent;
-import com.moko.support.mini0232d.event.DeviceOnlineEvent;
-import com.moko.support.mini0232d.event.MQTTMessageArrivedEvent;
+import com.moko.lib.mqtt.event.DeviceModifyNameEvent;
+import com.moko.lib.mqtt.event.DeviceOnlineEvent;
+import com.moko.lib.mqtt.event.MQTTMessageArrivedEvent;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.greenrobot.eventbus.EventBus;
@@ -305,7 +305,7 @@ public class BleManagerActivity extends BaseActivity<ActivityBleDevicesMini0232d
         if (bleDevice.type_code == 7) {
             // BXP-Button
             // show password
-            final PasswordRemoteBleDialog dialog = new PasswordRemoteBleDialog();
+            final PasswordBleDialog dialog = new PasswordBleDialog();
             dialog.setOnPasswordClicked(password -> {
                 if (!MokoSupport.getInstance().isBluetoothOpen()) {
                     MokoSupport.getInstance().enableBluetooth();

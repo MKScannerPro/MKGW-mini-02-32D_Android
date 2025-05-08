@@ -25,25 +25,25 @@ import com.moko.mkmini0232d.adapter.DeviceAdapter;
 import com.moko.mkmini0232d.base.BaseActivity;
 import com.moko.mkmini0232d.databinding.ActivityMainMini0232dBinding;
 import com.moko.mkmini0232d.db.DBTools;
-import com.moko.mkmini0232d.dialog.AlertMessageDialog;
+import com.moko.lib.scannerui.dialog.AlertMessageDialog;
 import com.moko.mkmini0232d.entity.MQTTConfig;
 import com.moko.mkmini0232d.entity.MokoDevice;
 import com.moko.mkmini0232d.utils.SPUtiles;
-import com.moko.mkmini0232d.utils.ToastUtils;
+import com.moko.lib.scannerui.utils.ToastUtils;
 import com.moko.mkmini0232d.utils.Utils;
 import com.moko.support.mini0232d.MQTTConstants;
-import com.moko.support.mini0232d.MQTTSupport;
+import com.moko.lib.mqtt.MQTTSupport;
 import com.moko.support.mini0232d.MokoSupport;
-import com.moko.support.mini0232d.entity.MsgNotify;
-import com.moko.support.mini0232d.event.DeviceDeletedEvent;
-import com.moko.support.mini0232d.event.DeviceModifyNameEvent;
-import com.moko.support.mini0232d.event.DeviceOnlineEvent;
-import com.moko.support.mini0232d.event.MQTTConnectionCompleteEvent;
-import com.moko.support.mini0232d.event.MQTTConnectionFailureEvent;
-import com.moko.support.mini0232d.event.MQTTConnectionLostEvent;
-import com.moko.support.mini0232d.event.MQTTMessageArrivedEvent;
-import com.moko.support.mini0232d.event.MQTTUnSubscribeFailureEvent;
-import com.moko.support.mini0232d.event.MQTTUnSubscribeSuccessEvent;
+import com.moko.lib.mqtt.entity.MsgNotify;
+import com.moko.lib.mqtt.event.DeviceDeletedEvent;
+import com.moko.lib.mqtt.event.DeviceModifyNameEvent;
+import com.moko.lib.mqtt.event.DeviceOnlineEvent;
+import com.moko.lib.mqtt.event.MQTTConnectionCompleteEvent;
+import com.moko.lib.mqtt.event.MQTTConnectionFailureEvent;
+import com.moko.lib.mqtt.event.MQTTConnectionLostEvent;
+import com.moko.lib.mqtt.event.MQTTMessageArrivedEvent;
+import com.moko.lib.mqtt.event.MQTTUnSubscribeFailureEvent;
+import com.moko.lib.mqtt.event.MQTTUnSubscribeSuccessEvent;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.greenrobot.eventbus.EventBus;
@@ -75,13 +75,13 @@ public class MainActivityMiNi0232D extends BaseActivity<ActivityMainMini0232dBin
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             // 优先保存到SD卡中
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                PATH_LOGCAT = getExternalFilesDir(null).getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "MKScannerPro" : "MKRemoteGW20D");
+                PATH_LOGCAT = getExternalFilesDir(null).getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "MKScannerPro" : "MINI32D");
             } else {
-                PATH_LOGCAT = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "MKScannerPro" : "MKRemoteGW20D");
+                PATH_LOGCAT = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "MKScannerPro" : "MINI32D");
             }
         } else {
             // 如果SD卡不存在，就保存到本应用的目录下
-            PATH_LOGCAT = getFilesDir().getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "MKScannerPro" : "MKRemoteGW20D");
+            PATH_LOGCAT = getFilesDir().getAbsolutePath() + File.separator + (BuildConfig.IS_LIBRARY ? "MKScannerPro" : "MINI32D");
         }
         if (!BuildConfig.IS_LIBRARY) {
             // 记录机型

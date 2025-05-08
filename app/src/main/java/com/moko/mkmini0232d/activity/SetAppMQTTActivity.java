@@ -20,18 +20,18 @@ import com.moko.mkmini0232d.R;
 import com.moko.mkmini0232d.adapter.MQTTFragmentAdapter;
 import com.moko.mkmini0232d.base.BaseActivity;
 import com.moko.mkmini0232d.databinding.ActivityMqttAppMini0232dBinding;
-import com.moko.mkmini0232d.dialog.AlertMessageDialog;
+import com.moko.lib.scannerui.dialog.AlertMessageDialog;
 import com.moko.mkmini0232d.entity.MQTTConfig;
 import com.moko.mkmini0232d.fragment.GeneralFragment;
 import com.moko.mkmini0232d.fragment.SSLFragment;
 import com.moko.mkmini0232d.fragment.UserFragment;
 import com.moko.mkmini0232d.utils.FileUtils;
 import com.moko.mkmini0232d.utils.SPUtiles;
-import com.moko.mkmini0232d.utils.ToastUtils;
+import com.moko.lib.scannerui.utils.ToastUtils;
 import com.moko.mkmini0232d.utils.Utils;
-import com.moko.support.mini0232d.MQTTSupport;
-import com.moko.support.mini0232d.event.MQTTConnectionCompleteEvent;
-import com.moko.support.mini0232d.event.MQTTConnectionFailureEvent;
+import com.moko.lib.mqtt.MQTTSupport;
+import com.moko.lib.mqtt.event.MQTTConnectionCompleteEvent;
+import com.moko.lib.mqtt.event.MQTTConnectionFailureEvent;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -62,6 +62,8 @@ public class SetAppMQTTActivity extends BaseActivity<ActivityMqttAppMini0232dBin
     private MQTTConfig mqttConfig;
     private String expertFilePath;
     private boolean isFileError;
+
+    private boolean mIsSetAppSettings;
 
     @Override
     protected void onCreate() {
@@ -126,6 +128,7 @@ public class SetAppMQTTActivity extends BaseActivity<ActivityMqttAppMini0232dBin
 
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 10)
     public void onMQTTConnectionCompleteEvent(MQTTConnectionCompleteEvent event) {
+        if (!mIsSetAppSettings) return;
         EventBus.getDefault().cancelEventDelivery(event);
         String mqttConfigStr = new Gson().toJson(mqttConfig, MQTTConfig.class);
         runOnUiThread(() -> {
@@ -140,6 +143,7 @@ public class SetAppMQTTActivity extends BaseActivity<ActivityMqttAppMini0232dBin
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMQTTConnectionFailureEvent(MQTTConnectionFailureEvent event) {
+        if (!mIsSetAppSettings) return;
         ToastUtils.showToast(SetAppMQTTActivity.this, getString(R.string.mqtt_connect_failed));
         dismissLoadingProgressDialog();
         finish();
@@ -202,6 +206,7 @@ public class SetAppMQTTActivity extends BaseActivity<ActivityMqttAppMini0232dBin
         MQTTSupport.getInstance().disconnectMqtt();
         showLoadingProgressDialog();
         mBind.etMqttHost.postDelayed(() -> {
+            mIsSetAppSettings = true;
             try {
                 MQTTSupport.getInstance().connectMqtt(mqttConfigStr);
             } catch (FileNotFoundException e) {

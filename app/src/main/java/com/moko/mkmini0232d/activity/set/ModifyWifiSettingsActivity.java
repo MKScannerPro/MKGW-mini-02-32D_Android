@@ -15,18 +15,18 @@ import com.moko.mkmini0232d.AppConstants;
 import com.moko.mkmini0232d.R;
 import com.moko.mkmini0232d.base.BaseActivity;
 import com.moko.mkmini0232d.databinding.ActivityModifyWifiSettingsMini0232dBinding;
-import com.moko.mkmini0232d.dialog.BottomDialog;
+import com.moko.lib.scannerui.dialog.BottomDialog;
 import com.moko.mkmini0232d.entity.MQTTConfig;
 import com.moko.mkmini0232d.entity.MokoDevice;
 import com.moko.mkmini0232d.utils.SPUtiles;
-import com.moko.mkmini0232d.utils.ToastUtils;
+import com.moko.lib.scannerui.utils.ToastUtils;
 import com.moko.support.mini0232d.MQTTConstants;
-import com.moko.support.mini0232d.MQTTSupport;
-import com.moko.support.mini0232d.entity.MsgConfigResult;
-import com.moko.support.mini0232d.entity.MsgNotify;
-import com.moko.support.mini0232d.entity.MsgReadResult;
-import com.moko.support.mini0232d.event.DeviceOnlineEvent;
-import com.moko.support.mini0232d.event.MQTTMessageArrivedEvent;
+import com.moko.lib.mqtt.MQTTSupport;
+import com.moko.lib.mqtt.entity.MsgConfigResult;
+import com.moko.lib.mqtt.entity.MsgNotify;
+import com.moko.lib.mqtt.entity.MsgReadResult;
+import com.moko.lib.mqtt.event.DeviceOnlineEvent;
+import com.moko.lib.mqtt.event.MQTTMessageArrivedEvent;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.greenrobot.eventbus.Subscribe;
@@ -265,7 +265,7 @@ public class ModifyWifiSettingsActivity extends BaseActivity<ActivityModifyWifiS
     }
 
     private void setDhcpEnable(boolean enable) {
-        mBind.layoutIp.imgDhcp.setImageResource(enable ? R.drawable.checkbox_open : R.drawable.checkbox_close);
+        mBind.layoutIp.imgDhcp.setImageResource(enable ? R.drawable.ic_checkbox_open : R.drawable.ic_checkbox_close);
         mBind.layoutIp.clIp.setVisibility(enable ? View.GONE : View.VISIBLE);
     }
 

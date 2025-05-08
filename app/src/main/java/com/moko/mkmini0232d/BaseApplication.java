@@ -24,9 +24,9 @@ import java.io.Writer;
 
 public class BaseApplication extends Application {
 
-    private static final String TAG = "MKRemoteGW20D";
-    private static final String LOG_FILE = "MKRemoteGW20D.txt";
-    private static final String LOG_FOLDER = "MKRemoteGW20D";
+    private static final String TAG = "MINI32D";
+    private static final String LOG_FILE = "MINI32D.txt";
+    private static final String LOG_FOLDER = "MINI32D";
     private static String PATH_LOGCAT;
 
     @Override

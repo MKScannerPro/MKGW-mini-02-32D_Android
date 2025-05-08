@@ -1,6 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.moko.mkmini0232d">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -11,8 +10,7 @@
         android:name="com.moko.mkmini0232d.BaseApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="MKMINI02_32D"
-        android:theme="@style/LaunchActivityTheme">
+        android:label="MKMINI02_32D">
 
         <activity
             android:name="com.moko.mkmini0232d.activity.GuideActivity"

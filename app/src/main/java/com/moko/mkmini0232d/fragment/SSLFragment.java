@@ -14,9 +14,9 @@ import androidx.fragment.app.Fragment;
 
 import com.moko.mkmini0232d.R;
 import com.moko.mkmini0232d.databinding.FragmentSslAppMini0232dBinding;
-import com.moko.mkmini0232d.dialog.BottomDialog;
+import com.moko.lib.scannerui.dialog.BottomDialog;
 import com.moko.mkmini0232d.utils.FileUtils;
-import com.moko.mkmini0232d.utils.ToastUtils;
+import com.moko.lib.scannerui.utils.ToastUtils;
 
 import java.io.File;
 import java.util.ArrayList;

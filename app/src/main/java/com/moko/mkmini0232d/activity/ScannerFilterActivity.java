@@ -14,7 +14,7 @@ import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.mkmini0232d.base.BaseActivity;
 import com.moko.mkmini0232d.databinding.ActivityScannerFilterMini0232dBinding;
-import com.moko.mkmini0232d.utils.ToastUtils;
+import com.moko.lib.scannerui.utils.ToastUtils;
 import com.moko.support.mini0232d.MokoSupport;
 import com.moko.support.mini0232d.OrderTaskAssembler;
 import com.moko.support.mini0232d.entity.OrderCHAR;

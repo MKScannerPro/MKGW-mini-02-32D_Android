@@ -373,9 +373,9 @@ The return data is a JSON String,refer to the protocol documentation(communicati
 - The folder name and file name saved on the SD card can be modified.
 
 		public class BaseApplication extends Application {
-			private static final String TAG = "MKRemoteGW20D";
-    		private static final String LOG_FILE = "MKRemoteGW20D.txt";
-    		private static final String LOG_FOLDER = "MKRemoteGW20D";
+			private static final String TAG = "MINI32D";
+    		private static final String LOG_FILE = "MINI32D.txt";
+    		private static final String LOG_FOLDER = "MINI32D";
 			...
 		}
 

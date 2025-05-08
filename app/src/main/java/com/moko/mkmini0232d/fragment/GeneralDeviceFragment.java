@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.moko.mkmini0232d.databinding.FragmentGeneralDeviceMini0232dBinding;
-import com.moko.mkmini0232d.utils.ToastUtils;
+import com.moko.lib.scannerui.utils.ToastUtils;
 
 public class GeneralDeviceFragment extends Fragment {
     private FragmentGeneralDeviceMini0232dBinding mBind;

@@ -16,7 +16,7 @@
             android:paddingLeft="12dp"
             android:paddingRight="12dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/back" />
+            android:src="@drawable/ic_back" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -62,7 +62,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="12dp"
                     android:layout_marginRight="12dp"
-                    android:drawableRight="@drawable/arrow_right"
+                    android:drawableRight="@drawable/ic_arrow_right"
                     android:drawablePadding="10dp"
                     android:gravity="center_vertical"
                     android:text="ON"
@@ -96,7 +96,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="12dp"
                     android:layout_marginRight="12dp"
-                    android:drawableRight="@drawable/arrow_right"
+                    android:drawableRight="@drawable/ic_arrow_right"
                     android:drawablePadding="10dp"
                     android:gravity="center_vertical"
                     android:text="ON"
@@ -130,7 +130,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="12dp"
                     android:layout_marginRight="12dp"
-                    android:drawableRight="@drawable/arrow_right"
+                    android:drawableRight="@drawable/ic_arrow_right"
                     android:drawablePadding="10dp"
                     android:gravity="center_vertical"
                     android:text="ON"
@@ -164,7 +164,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="12dp"
                     android:layout_marginRight="12dp"
-                    android:drawableRight="@drawable/arrow_right"
+                    android:drawableRight="@drawable/ic_arrow_right"
                     android:drawablePadding="10dp"
                     android:gravity="center_vertical"
                     android:text="ON"
@@ -198,7 +198,7 @@
                     android:layout_centerVertical="true"
                     android:paddingLeft="12dp"
                     android:paddingRight="12dp"
-                    android:src="@drawable/checkbox_close" />
+                    android:src="@drawable/ic_checkbox_close" />
             </RelativeLayout>
 
             <View style="@style/divider_line" />
@@ -227,7 +227,7 @@
                     android:layout_centerVertical="true"
                     android:paddingLeft="12dp"
                     android:paddingRight="12dp"
-                    android:src="@drawable/checkbox_close" />
+                    android:src="@drawable/ic_checkbox_close" />
             </RelativeLayout>
 
             <View style="@style/divider_line" />
@@ -256,7 +256,7 @@
                     android:layout_centerVertical="true"
                     android:paddingLeft="12dp"
                     android:paddingRight="12dp"
-                    android:src="@drawable/checkbox_close" />
+                    android:src="@drawable/ic_checkbox_close" />
             </RelativeLayout>
 
             <View style="@style/divider_line" />
@@ -285,7 +285,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="12dp"
                     android:layout_marginRight="12dp"
-                    android:drawableRight="@drawable/arrow_right"
+                    android:drawableRight="@drawable/ic_arrow_right"
                     android:drawablePadding="10dp"
                     android:gravity="center_vertical"
                     android:text="ON"
@@ -319,7 +319,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="12dp"
                     android:layout_marginRight="12dp"
-                    android:drawableRight="@drawable/arrow_right"
+                    android:drawableRight="@drawable/ic_arrow_right"
                     android:drawablePadding="10dp"
                     android:gravity="center_vertical"
                     android:text="ON"
@@ -353,7 +353,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="12dp"
                     android:layout_marginRight="12dp"
-                    android:drawableRight="@drawable/arrow_right"
+                    android:drawableRight="@drawable/ic_arrow_right"
                     android:drawablePadding="10dp"
                     android:gravity="center_vertical"
                     android:text="ON"
@@ -387,7 +387,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="12dp"
                     android:layout_marginRight="12dp"
-                    android:drawableRight="@drawable/arrow_right"
+                    android:drawableRight="@drawable/ic_arrow_right"
                     android:drawablePadding="10dp"
                     android:gravity="center_vertical"
                     android:text="ON"
@@ -421,7 +421,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="12dp"
                     android:layout_marginRight="12dp"
-                    android:drawableRight="@drawable/arrow_right"
+                    android:drawableRight="@drawable/ic_arrow_right"
                     android:drawablePadding="10dp"
                     android:gravity="center_vertical"
                     android:text="ON"
