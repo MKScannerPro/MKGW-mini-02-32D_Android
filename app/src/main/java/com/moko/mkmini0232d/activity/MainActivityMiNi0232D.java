@@ -390,7 +390,7 @@ public class MainActivityMiNi0232D extends BaseActivity<ActivityMainMini0232dBin
                             syncDevice.publishTopic = device.topicPublish;
                             syncDevice.subscribeTopic = device.topicSubscribe;
                             syncDevice.lastWill = device.lwtTopic;
-                            syncDevice.model = "25";
+                            syncDevice.model = "12";
                             syncDevices.add(syncDevice);
                         }
                         intent.putExtra(IoTDMConstants.EXTRA_KEY_SYNC_DEVICES, syncDevices);
