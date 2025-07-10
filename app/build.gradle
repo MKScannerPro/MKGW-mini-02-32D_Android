@@ -11,8 +11,8 @@ android {
     defaultConfig {
         minSdk 26
         targetSdk 34
-        versionCode 103
-        versionName "1.0.3"
+        versionCode 104
+        versionName "1.0.4"
         def formatDate = new Date().format("yyyyMMddHHmm")
         setProperty("archivesBaseName", "MKMINI02_32D_${versionName}_${formatDate}")
     }
@@ -92,11 +92,11 @@ dependencies {
         implementation project(path: ':mokosupport')
         implementation files('libs/poi-3.12-android-a.jar')
         implementation files('libs/poi-ooxml-schemas-3.12-20150511-a.jar')
-        implementation 'com.github.MOKO-Android-Base-Library:MKScannerUILib:1.0.2'
+        implementation 'com.github.MOKO-Android-Base-Library:MKScannerIoTLib:1.0.8'
         implementation 'com.github.MOKO-Android-Base-Library:MKMqttLib:1.0.0'
     } else {
         implementation files('libs/mokoSupport.jar')
-        compileOnly 'com.github.MOKO-Android-Base-Library:MKScannerUILib:1.0.2'
+        compileOnly 'com.github.MOKO-Android-Base-Library:MKScannerIoTLib:1.0.8'
         compileOnly 'com.github.MOKO-Android-Base-Library:MKMqttLib:1.0.0'
         compileOnly 'com.github.MOKO-Android-Base-Library:MKBleLib:1.0.1'
         compileOnly files('libs/poi-3.12-android-a.jar')
