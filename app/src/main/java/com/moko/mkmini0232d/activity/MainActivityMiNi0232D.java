@@ -32,8 +32,8 @@ import com.moko.lib.scanneriot.utils.IoTDMSPUtils;
 import com.moko.mkmini0232d.AppConstants;
 import com.moko.mkmini0232d.BuildConfig;
 import com.moko.mkmini0232d.R;
-import com.moko.mkmini0232d.activity.set.DeviceSettingActivity;
-import com.moko.mkmini0232d.activity.set.ModifySettingsActivity;
+import com.moko.mkmini0232d.activity.add.DeviceScannerActivity;
+import com.moko.mkmini0232d.activity.modify.ModifySettingsActivity;
 import com.moko.mkmini0232d.adapter.DeviceAdapter;
 import com.moko.mkmini0232d.base.BaseActivity;
 import com.moko.mkmini0232d.databinding.ActivityMainMini0232dBinding;
@@ -259,35 +259,35 @@ public class MainActivityMiNi0232D extends BaseActivity<ActivityMainMini0232dBin
             }
             if (ModifySettingsActivity.TAG.equals(from)) {
                 if (!TextUtils.isEmpty(mac)) {
-                    MokoDevice mokoDevice = DBTools.getInstance(getApplicationContext()).selectDevice(mac);
+                    MokoDevice MokoDevice = DBTools.getInstance(getApplicationContext()).selectDevice(mac);
                     for (final MokoDevice device : devices) {
                         if (mac.equals(device.mac)) {
                             if (TextUtils.isEmpty(mAppMqttConfig.topicSubscribe)) {
                                 try {
-                                    if (!device.topicPublish.equals(mokoDevice.topicPublish)) {
+                                    if (!device.topicPublish.equals(MokoDevice.topicPublish)) {
                                         // 取消订阅旧主题
                                         MQTTSupport.getInstance().unSubscribe(device.topicPublish);
                                         // 订阅新主题
-                                        MQTTSupport.getInstance().subscribe(mokoDevice.topicPublish, mAppMqttConfig.qos);
+                                        MQTTSupport.getInstance().subscribe(MokoDevice.topicPublish, mAppMqttConfig.qos);
                                     }
                                     if (device.lwtEnable == 1
                                             && !TextUtils.isEmpty(device.lwtTopic)
-                                            && !device.lwtTopic.equals(mokoDevice.topicPublish)) {
+                                            && !device.lwtTopic.equals(MokoDevice.topicPublish)) {
                                         // 取消订阅旧遗愿主题
                                         MQTTSupport.getInstance().unSubscribe(device.lwtTopic);
                                         // 订阅新遗愿主题
-                                        MQTTSupport.getInstance().subscribe(mokoDevice.lwtTopic, mAppMqttConfig.qos);
+                                        MQTTSupport.getInstance().subscribe(MokoDevice.lwtTopic, mAppMqttConfig.qos);
 
                                     }
                                 } catch (MqttException e) {
                                     XLog.e(e);
                                 }
                             }
-                            device.mqttInfo = mokoDevice.mqttInfo;
-                            device.topicPublish = mokoDevice.topicPublish;
-                            device.topicSubscribe = mokoDevice.topicSubscribe;
-                            device.lwtEnable = mokoDevice.lwtEnable;
-                            device.lwtTopic = mokoDevice.lwtTopic;
+                            device.mqttInfo = MokoDevice.mqttInfo;
+                            device.topicPublish = MokoDevice.topicPublish;
+                            device.topicSubscribe = MokoDevice.topicSubscribe;
+                            device.lwtEnable = MokoDevice.lwtEnable;
+                            device.lwtTopic = MokoDevice.lwtTopic;
                             break;
                         }
                     }
@@ -414,25 +414,25 @@ public class MainActivityMiNi0232D extends BaseActivity<ActivityMainMini0232dBin
 
     @Override
     public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-        MokoDevice mokoDevice = (MokoDevice) adapter.getItem(position);
-        if (mokoDevice == null) return;
+        MokoDevice MokoDevice = (MokoDevice) adapter.getItem(position);
+        if (MokoDevice == null) return;
         if (!MQTTSupport.getInstance().isConnected()) {
             ToastUtils.showToast(this, R.string.network_error);
             return;
         }
-        if (!mokoDevice.isOnline) {
+        if (!MokoDevice.isOnline) {
             ToastUtils.showToast(this, R.string.device_offline);
             return;
         }
         Intent i = new Intent(this, DeviceDetailActivity.class);
-        i.putExtra(AppConstants.EXTRA_KEY_DEVICE, mokoDevice);
+        i.putExtra(AppConstants.EXTRA_KEY_DEVICE, MokoDevice);
         startActivity(i);
     }
 
     @Override
     public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
-        MokoDevice mokoDevice = (MokoDevice) adapter.getItem(position);
-        if (mokoDevice == null) return true;
+        MokoDevice MokoDevice = (MokoDevice) adapter.getItem(position);
+        if (MokoDevice == null) return true;
         AlertMessageDialog dialog = new AlertMessageDialog();
         dialog.setTitle("Remove Device");
         dialog.setMessage("Please confirm again whether to \n remove the device");
@@ -445,19 +445,19 @@ public class MainActivityMiNi0232D extends BaseActivity<ActivityMainMini0232dBin
             // 取消订阅
             if (TextUtils.isEmpty(mAppMqttConfig.topicSubscribe)) {
                 try {
-                    MQTTSupport.getInstance().unSubscribe(mokoDevice.topicPublish);
-                    if (mokoDevice.lwtEnable == 1
-                            && !TextUtils.isEmpty(mokoDevice.lwtTopic)
-                            && !mokoDevice.lwtTopic.equals(mokoDevice.topicPublish))
-                        MQTTSupport.getInstance().unSubscribe(mokoDevice.lwtTopic);
+                    MQTTSupport.getInstance().unSubscribe(MokoDevice.topicPublish);
+                    if (MokoDevice.lwtEnable == 1
+                            && !TextUtils.isEmpty(MokoDevice.lwtTopic)
+                            && !MokoDevice.lwtTopic.equals(MokoDevice.topicPublish))
+                        MQTTSupport.getInstance().unSubscribe(MokoDevice.lwtTopic);
                 } catch (MqttException e) {
                     XLog.e(e);
                 }
             }
-            XLog.i(String.format("删除设备:%s", mokoDevice.name));
-            DBTools.getInstance(getApplicationContext()).deleteDevice(mokoDevice);
-            EventBus.getDefault().post(new DeviceDeletedEvent(mokoDevice.id));
-            devices.remove(mokoDevice);
+            XLog.i(String.format("删除设备:%s", MokoDevice.name));
+            DBTools.getInstance(getApplicationContext()).deleteDevice(MokoDevice);
+            EventBus.getDefault().post(new DeviceDeletedEvent(MokoDevice.id));
+            devices.remove(MokoDevice);
             this.adapter.replaceData(devices);
             if (devices.isEmpty()) {
                 mBind.rlEmpty.setVisibility(View.VISIBLE);

@@ -6,16 +6,31 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.view.View;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import com.elvishew.xlog.XLog;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.moko.lib.mqtt.MQTTSupport;
+import com.moko.lib.mqtt.entity.MsgConfigResult;
+import com.moko.lib.mqtt.entity.MsgNotify;
+import com.moko.lib.mqtt.entity.MsgReadResult;
+import com.moko.lib.mqtt.event.DeviceModifyNameEvent;
+import com.moko.lib.mqtt.event.DeviceOnlineEvent;
+import com.moko.lib.mqtt.event.MQTTMessageArrivedEvent;
+import com.moko.lib.scannerui.utils.ToastUtils;
 import com.moko.mkmini0232d.AppConstants;
 import com.moko.mkmini0232d.R;
-import com.moko.mkmini0232d.activity.set.DeviceSettingActivity;
+import com.moko.mkmini0232d.activity.beacon.BXPBCRActivity;
+import com.moko.mkmini0232d.activity.beacon.BXPBDActivity;
+import com.moko.mkmini0232d.activity.beacon.BXPButtonInfoActivity;
+import com.moko.mkmini0232d.activity.beacon.BXPCActivity;
+import com.moko.mkmini0232d.activity.beacon.BXPDActivity;
+import com.moko.mkmini0232d.activity.beacon.BXPSActivity;
+import com.moko.mkmini0232d.activity.beacon.BXPTActivity;
+import com.moko.mkmini0232d.activity.beacon.BleOtherInfoActivity;
+import com.moko.mkmini0232d.activity.beacon.MKPIRActivity;
+import com.moko.mkmini0232d.activity.beacon.MKTOFActivity;
 import com.moko.mkmini0232d.adapter.ScanDeviceAdapter;
 import com.moko.mkmini0232d.base.BaseActivity;
 import com.moko.mkmini0232d.databinding.ActivityDetailMini0232dBinding;
@@ -23,18 +38,10 @@ import com.moko.mkmini0232d.db.DBTools;
 import com.moko.mkmini0232d.entity.MQTTConfig;
 import com.moko.mkmini0232d.entity.MokoDevice;
 import com.moko.mkmini0232d.utils.SPUtiles;
-import com.moko.lib.scannerui.utils.ToastUtils;
 import com.moko.support.mini0232d.MQTTConstants;
-import com.moko.lib.mqtt.MQTTSupport;
-import com.moko.support.mini0232d.entity.BXPButtonInfo;
+import com.moko.support.mini0232d.entity.BeaconInfo;
 import com.moko.support.mini0232d.entity.BleConnectedList;
-import com.moko.lib.mqtt.entity.MsgConfigResult;
-import com.moko.lib.mqtt.entity.MsgNotify;
-import com.moko.lib.mqtt.entity.MsgReadResult;
 import com.moko.support.mini0232d.entity.OtherDeviceInfo;
-import com.moko.lib.mqtt.event.DeviceModifyNameEvent;
-import com.moko.lib.mqtt.event.DeviceOnlineEvent;
-import com.moko.lib.mqtt.event.MQTTMessageArrivedEvent;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.greenrobot.eventbus.Subscribe;
@@ -43,6 +50,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 public class DeviceDetailActivity extends BaseActivity<ActivityDetailMini0232dBinding> {
     public static final String TAG = DeviceDetailActivity.class.getSimpleName();
@@ -53,7 +62,7 @@ public class DeviceDetailActivity extends BaseActivity<ActivityDetailMini0232dBi
     private ScanDeviceAdapter mAdapter;
     private final List<String> mScanDevices = new LinkedList<>();
     private Handler mHandler;
-    private BXPButtonInfo mConnectedBXPButtonInfo;
+    private BeaconInfo mConnectedBeaconInfo;
 
     @Override
     protected void onCreate() {
@@ -159,11 +168,12 @@ public class DeviceDetailActivity extends BaseActivity<ActivityDetailMini0232dBi
                 // 当前连接的设备有值
                 BleConnectedList.BleDevice bleDevice = result.data.ble_conn_list.get(0);
                 // 根据类型请求不同数据
-                if (bleDevice.type == 1) {
-                    mConnectedBXPButtonInfo = new BXPButtonInfo();
-                    readBXPButtonInfo(bleDevice.mac);
+                if (bleDevice.type > 0) {
+                    mConnectedBeaconInfo = new BeaconInfo();
+                    mConnectedBeaconInfo.type = bleDevice.type;
+                    readConnectedBeaconInfo(bleDevice.mac, bleDevice.type);
                 } else {
-                    readOtherInfo(bleDevice.mac);
+                    readConnectedOtherInfo(bleDevice.mac);
                 }
             } else {
                 Intent intent = new Intent(this, BleManagerActivity.class);
@@ -171,49 +181,105 @@ public class DeviceDetailActivity extends BaseActivity<ActivityDetailMini0232dBi
                 startActivity(intent);
             }
         }
-        if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_BUTTON_INFO) {
+        if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_B_D_INFO
+                || msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_B_CR_INFO
+                || msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_C_INFO
+                || msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_D_INFO
+                || msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_T_INFO
+                || msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_S_INFO
+                || msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_MK_PIR_INFO
+                || msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_MK_TOF_INFO) {
             dismissLoadingProgressDialog();
             mHandler.removeMessages(0);
-            Type type = new TypeToken<MsgNotify<BXPButtonInfo>>() {
+            Type type = new TypeToken<MsgNotify<BeaconInfo>>() {
             }.getType();
-            MsgNotify<BXPButtonInfo> result = new Gson().fromJson(message, type);
-            if (!mMokoDevice.mac.equalsIgnoreCase(result.device_info.mac))
-                return;
-            BXPButtonInfo bxpButtonInfo = result.data;
-            if (bxpButtonInfo.result_code != 0) {
+            MsgNotify<BeaconInfo> result = new Gson().fromJson(message, type);
+            if (!mMokoDevice.mac.equalsIgnoreCase(result.device_info.mac)) return;
+            BeaconInfo beaconInfo = result.data;
+            if (beaconInfo.result_code != 0) {
                 ToastUtils.showToast(this, "Setup failed");
                 return;
             }
-            mConnectedBXPButtonInfo.mac = bxpButtonInfo.mac;
-            mConnectedBXPButtonInfo.product_model = bxpButtonInfo.product_model;
-            mConnectedBXPButtonInfo.company_name = bxpButtonInfo.company_name;
-            mConnectedBXPButtonInfo.hardware_version = bxpButtonInfo.hardware_version;
-            mConnectedBXPButtonInfo.software_version = bxpButtonInfo.software_version;
-            mConnectedBXPButtonInfo.firmware_version = bxpButtonInfo.firmware_version;
-            readBXPButtonStatus(bxpButtonInfo.mac);
+            mConnectedBeaconInfo.mac = beaconInfo.mac;
+            mConnectedBeaconInfo.product_model = beaconInfo.product_model;
+            mConnectedBeaconInfo.company_name = beaconInfo.company_name;
+            mConnectedBeaconInfo.hardware_version = beaconInfo.hardware_version;
+            mConnectedBeaconInfo.software_version = beaconInfo.software_version;
+            mConnectedBeaconInfo.firmware_version = beaconInfo.firmware_version;
+            mConnectedBeaconInfo.sensor_status = beaconInfo.sensor_status;
+            mConnectedBeaconInfo.axis_type = beaconInfo.axis_type;
+            mConnectedBeaconInfo.th_type = beaconInfo.th_type;
+            mConnectedBeaconInfo.light_type = beaconInfo.light_type;
+            mConnectedBeaconInfo.pir_type = beaconInfo.pir_type;
+            mConnectedBeaconInfo.tof_type = beaconInfo.tof_type;
+            if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_B_CR_INFO) {
+                readConnectedBeaconStatus(beaconInfo.mac, MQTTConstants.CONFIG_MSG_ID_BLE_BXP_B_CR_STATUS);
+            } else if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_C_INFO) {
+                readConnectedBeaconStatus(beaconInfo.mac, MQTTConstants.CONFIG_MSG_ID_BLE_BXP_C_STATUS);
+            } else if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_D_INFO) {
+                readConnectedBeaconStatus(beaconInfo.mac, MQTTConstants.CONFIG_MSG_ID_BLE_BXP_D_STATUS);
+            } else if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_T_INFO) {
+                readConnectedBeaconStatus(beaconInfo.mac, MQTTConstants.CONFIG_MSG_ID_BLE_BXP_T_STATUS);
+            } else if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_S_INFO) {
+                readConnectedBeaconStatus(beaconInfo.mac, MQTTConstants.CONFIG_MSG_ID_BLE_BXP_S_STATUS);
+            } else if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_MK_PIR_INFO) {
+                readConnectedBeaconStatus(beaconInfo.mac, MQTTConstants.CONFIG_MSG_ID_BLE_MK_PIR_STATUS);
+            } else if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_MK_TOF_INFO) {
+                readConnectedBeaconStatus(beaconInfo.mac, MQTTConstants.CONFIG_MSG_ID_BLE_MK_TOF_STATUS);
+            } else {
+                readConnectedBeaconStatus(beaconInfo.mac, MQTTConstants.CONFIG_MSG_ID_BLE_BXP_B_D_STATUS);
+            }
         }
-        if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_BUTTON_STATUS) {
+        if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_B_D_STATUS
+                || msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_B_CR_STATUS
+                || msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_C_STATUS
+                || msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_D_STATUS
+                || msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_T_STATUS
+                || msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_S_STATUS
+                || msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_MK_PIR_STATUS
+                || msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_MK_TOF_STATUS) {
             dismissLoadingProgressDialog();
             mHandler.removeMessages(0);
-            Type type = new TypeToken<MsgNotify<BXPButtonInfo>>() {
+            Type type = new TypeToken<MsgNotify<BeaconInfo>>() {
             }.getType();
-            MsgNotify<BXPButtonInfo> result = new Gson().fromJson(message, type);
+            MsgNotify<BeaconInfo> result = new Gson().fromJson(message, type);
             if (!mMokoDevice.mac.equalsIgnoreCase(result.device_info.mac))
                 return;
-            BXPButtonInfo bxpButtonInfo = result.data;
-            if (bxpButtonInfo.result_code != 0) {
+            BeaconInfo beaconInfo = result.data;
+            if (beaconInfo.result_code != 0) {
                 ToastUtils.showToast(this, "Setup failed");
                 return;
             }
-            mConnectedBXPButtonInfo.battery_v = bxpButtonInfo.battery_v;
-            mConnectedBXPButtonInfo.single_alarm_num = bxpButtonInfo.single_alarm_num;
-            mConnectedBXPButtonInfo.double_alarm_num = bxpButtonInfo.double_alarm_num;
-            mConnectedBXPButtonInfo.long_alarm_num = bxpButtonInfo.long_alarm_num;
-            mConnectedBXPButtonInfo.alarm_status = bxpButtonInfo.alarm_status;
+            mConnectedBeaconInfo.battery_v = beaconInfo.battery_v;
+            mConnectedBeaconInfo.battery_level = beaconInfo.battery_level;
+            mConnectedBeaconInfo.single_alarm_num = beaconInfo.single_alarm_num;
+            mConnectedBeaconInfo.double_alarm_num = beaconInfo.double_alarm_num;
+            mConnectedBeaconInfo.long_alarm_num = beaconInfo.long_alarm_num;
+            mConnectedBeaconInfo.alarm_status = beaconInfo.alarm_status;
+            mConnectedBeaconInfo.run_time = beaconInfo.run_time;
             ToastUtils.showToast(this, "Setup succeed");
-            Intent intent = new Intent(this, BXPButtonInfoActivity.class);
+            Intent intent;
+            if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_B_CR_STATUS) {
+                intent = new Intent(this, BXPBCRActivity.class);
+            } else if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_C_STATUS) {
+                intent = new Intent(this, BXPCActivity.class);
+            } else if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_D_STATUS) {
+                intent = new Intent(this, BXPDActivity.class);
+            } else if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_T_STATUS) {
+                intent = new Intent(this, BXPTActivity.class);
+            } else if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_S_STATUS) {
+                intent = new Intent(this, BXPSActivity.class);
+            } else if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_MK_PIR_STATUS) {
+                intent = new Intent(this, MKPIRActivity.class);
+            } else if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_MK_TOF_STATUS) {
+                intent = new Intent(this, MKTOFActivity.class);
+            } else {
+                intent = new Intent(this, BXPButtonInfoActivity.class);
+                if (mMokoDevice.deviceType == 0x71)
+                    intent = new Intent(this, BXPBDActivity.class);
+            }
             intent.putExtra(AppConstants.EXTRA_KEY_DEVICE, mMokoDevice);
-            intent.putExtra(AppConstants.EXTRA_KEY_BXP_BUTTON_INFO, mConnectedBXPButtonInfo);
+            intent.putExtra(AppConstants.EXTRA_KEY_BEACON_INFO, mConnectedBeaconInfo);
             startActivity(intent);
         }
         if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_OTHER_INFO) {
@@ -353,7 +419,7 @@ public class DeviceDetailActivity extends BaseActivity<ActivityDetailMini0232dBi
         }
     }
 
-    private void readOtherInfo(String mac) {
+    private void readConnectedOtherInfo(String mac) {
         mHandler.postDelayed(() -> {
             dismissLoadingProgressDialog();
             ToastUtils.showToast(this, "Setup failed");
@@ -374,45 +440,58 @@ public class DeviceDetailActivity extends BaseActivity<ActivityDetailMini0232dBi
         }
     }
 
-    public void readBXPButtonInfo(String mac) {
+    public void readConnectedBeaconInfo(String mac, int type) {
         mHandler.postDelayed(() -> {
             dismissLoadingProgressDialog();
             ToastUtils.showToast(this, "Setup failed");
         }, 30 * 1000);
         showLoadingProgressDialog();
-        getBXPButtonInfo(mac);
+        getConnectedBeaconInfo(mac, type);
     }
 
-    private void getBXPButtonInfo(String mac) {
-        int msgId = MQTTConstants.CONFIG_MSG_ID_BLE_BXP_BUTTON_INFO;
+    private void getConnectedBeaconInfo(String mac, int type) {
+        int msgId = MQTTConstants.CONFIG_MSG_ID_BLE_BXP_B_D_INFO;
+        if (type == 2)
+            msgId = MQTTConstants.CONFIG_MSG_ID_BLE_BXP_B_CR_INFO;
+        if (type == 3)
+            msgId = MQTTConstants.CONFIG_MSG_ID_BLE_BXP_C_INFO;
+        if (type == 4)
+            msgId = MQTTConstants.CONFIG_MSG_ID_BLE_BXP_D_INFO;
+        if (type == 5)
+            msgId = MQTTConstants.CONFIG_MSG_ID_BLE_BXP_T_INFO;
+        if (type == 6)
+            msgId = MQTTConstants.CONFIG_MSG_ID_BLE_BXP_S_INFO;
+        if (type == 7)
+            msgId = MQTTConstants.CONFIG_MSG_ID_BLE_MK_PIR_INFO;
+        if (type == 8)
+            msgId = MQTTConstants.CONFIG_MSG_ID_BLE_MK_TOF_INFO;
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("mac", mac);
         String message = assembleWriteCommonData(msgId, mMokoDevice.mac, jsonObject);
         try {
             MQTTSupport.getInstance().publish(mAppTopic, message, msgId, appMqttConfig.qos);
         } catch (MqttException e) {
-            XLog.e(e);
+            e.printStackTrace();
         }
     }
 
-    public void readBXPButtonStatus(String mac) {
+    public void readConnectedBeaconStatus(String mac, int msgId) {
         mHandler.postDelayed(() -> {
             dismissLoadingProgressDialog();
             ToastUtils.showToast(this, "Setup failed");
         }, 30 * 1000);
         showLoadingProgressDialog();
-        getBXPButtonStatus(mac);
+        getConnectedBeaconStatus(mac, msgId);
     }
 
-    private void getBXPButtonStatus(String mac) {
-        int msgId = MQTTConstants.CONFIG_MSG_ID_BLE_BXP_BUTTON_STATUS;
+    private void getConnectedBeaconStatus(String mac, int msgId) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("mac", mac);
         String message = assembleWriteCommonData(msgId, mMokoDevice.mac, jsonObject);
         try {
             MQTTSupport.getInstance().publish(mAppTopic, message, msgId, appMqttConfig.qos);
         } catch (MqttException e) {
-            XLog.e(e);
+            e.printStackTrace();
         }
     }
 }

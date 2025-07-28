@@ -158,7 +158,7 @@ public class FilterMKTOFActivity extends BaseActivity<ActivityFilterMktofMini023
         if (isWindowLocked()) return;
         int count = mBind.llMfgCode.getChildCount();
         if (count > 9) {
-            ToastUtils.showToast(this, "You can set up to 10 filters!");
+            ToastUtils.showToast(this, "You can settings up to 10 filters!");
             return;
         }
         View v = LayoutInflater.from(this).inflate(R.layout.item_tof_filter_mini02_32d, mBind.llMfgCode, false);

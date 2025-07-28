@@ -199,7 +199,7 @@ public class FilterOtherActivity extends BaseActivity<ActivityFilterOtherMini023
         if (isWindowLocked()) return;
         int count = mBind.llFilterCondition.getChildCount();
         if (count > 2) {
-            ToastUtils.showToast(this, "You can set up to 3 filters!");
+            ToastUtils.showToast(this, "You can settings up to 3 filters!");
             return;
         }
         View v = LayoutInflater.from(this).inflate(R.layout.item_other_filter_mini02_32d, mBind.llFilterCondition, false);

@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.moko.mkmini0232d.activity.set.ModifyMQTTSettingsActivity;
+import com.moko.mkmini0232d.activity.modify.ModifyMQTTSettingsActivity;
 import com.moko.mkmini0232d.databinding.FragmentSslDeviceUrlMini0232dBinding;
 import com.moko.lib.scannerui.dialog.BottomDialog;
 

@@ -54,6 +54,15 @@ public class ParamsTask extends OrderTask {
         response.responseValue = data;
     }
 
+    public void getNearbyWifi() {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_WIFI_SEARCH.getParamsKey(),
+                (byte) 0x00
+        };
+    }
+
     public void reboot() {
         data = new byte[]{
                 (byte) 0xED,
@@ -617,6 +626,21 @@ public class ParamsTask extends OrderTask {
         response.responseValue = data;
     }
 
+    public void setReportInterval(@IntRange(from = 0, to = 86400) int interval) {
+        byte[] dataBytes = MokoUtils.toByteArray(interval, 4);
+        data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_REPORT_INTERVAL.getParamsKey(),
+                (byte) 0x04,
+                (byte) dataBytes[0],
+                (byte) dataBytes[1],
+                (byte) dataBytes[2],
+                (byte) dataBytes[3]
+        };
+        response.responseValue = data;
+    }
+
     public void setFile(ParamsLongKeyEnum key, File file) throws Exception {
         FileInputStream inputSteam = new FileInputStream(file);
         dataBytes = new byte[(int) file.length()];
@@ -930,6 +954,16 @@ public class ParamsTask extends OrderTask {
                 (byte) ParamsKeyEnum.KEY_I_BEACON_RSSI1M.getParamsKey(),
                 (byte) 0x01,
                 (byte) rssi1M
+        };
+    }
+
+    public void setIBeaconConnectable(@IntRange(from = 0, to = 1) int enable) {
+        response.responseValue = data = new byte[]{
+                (byte) 0xED,
+                (byte) 0x01,
+                (byte) ParamsKeyEnum.KEY_I_BEACON_CONNECTABLE.getParamsKey(),
+                (byte) 0x01,
+                (byte) enable
         };
     }
 }

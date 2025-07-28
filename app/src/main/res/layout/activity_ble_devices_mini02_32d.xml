@@ -43,6 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@drawable/shape_radius_white_bg"
+            android:clickable="true"
             android:gravity="center_vertical"
             android:onClick="onFilter"
             android:paddingLeft="10dp"
@@ -60,6 +61,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@drawable/shape_radius_white_bg"
+            android:clickable="true"
             android:onClick="onFilter"
             android:paddingLeft="10dp"
             android:visibility="gone"
@@ -82,13 +84,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
+                android:clickable="true"
                 android:onClick="onFilterDelete"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:src="@drawable/ic_filter_delete" />
+
         </RelativeLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/tv_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="Count：0"
+        android:textColor="@color/black_333333"
+        android:textSize="16sp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_devices"
@@ -97,7 +113,6 @@
         android:layout_marginTop="10dp"
         android:layout_weight="1.0"
         android:overScrollMode="never"
-        tools:itemCount="3"
         tools:listitem="@layout/item_ble_device_mini02_32d" />
 
 </LinearLayout>

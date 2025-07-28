@@ -168,7 +168,7 @@ public class FilterAdvNameActivity extends BaseActivity<ActivityFilterAdvNameMin
         if (isWindowLocked()) return;
         int count = mBind.llDavName.getChildCount();
         if (count > 9) {
-            ToastUtils.showToast(this, "You can set up to 10 filters!");
+            ToastUtils.showToast(this, "You can settings up to 10 filters!");
             return;
         }
         View v = LayoutInflater.from(this).inflate(R.layout.item_adv_name_filter, mBind.llDavName, false);
