@@ -38,7 +38,7 @@ public class DeviceInformationActivity extends BaseActivity<ActivityDeviceInfoMi
         orderTasks.add(OrderTaskAssembler.getHardwareVersion());
         orderTasks.add(OrderTaskAssembler.getWifiSoftwareVersion());
         orderTasks.add(OrderTaskAssembler.getWifiFirmwareVersion());
-        if (selectedDeviceType != 0) {
+        if (selectedDeviceType != 0x70) {
             orderTasks.add(OrderTaskAssembler.getBleFirmwareVersion());
         }
         orderTasks.add(OrderTaskAssembler.getWifiMac());
@@ -94,8 +94,7 @@ public class DeviceInformationActivity extends BaseActivity<ActivityDeviceInfoMi
                             }
                             int length = value[3] & 0xFF;
                             if (flag == 0x00) {
-                                if (length == 0)
-                                    return;
+                                if (length == 0) return;
                                 // read
                                 switch (configKeyEnum) {
                                     case KEY_DEVICE_NAME:

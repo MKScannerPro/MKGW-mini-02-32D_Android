@@ -208,11 +208,8 @@ public class BXPDActivity extends BaseActivity<ActivityBxpDInfoMini0232dBinding>
 
     private final ActivityResultLauncher<Intent> startBeaconDFU = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_OK && null != result.getData()) {
-            int code = result.getData().getIntExtra("code", 0);
-            if (code != 3) {
-                ToastUtils.showToast(this, "Bluetooth disconnect");
-                finish();
-            }
+            ToastUtils.showToast(this, "Bluetooth disconnect");
+            finish();
         }
     });
 

@@ -18,6 +18,7 @@ import com.moko.lib.mqtt.entity.MsgReadResult;
 import com.moko.lib.mqtt.event.DeviceModifyNameEvent;
 import com.moko.lib.mqtt.event.DeviceOnlineEvent;
 import com.moko.lib.mqtt.event.MQTTMessageArrivedEvent;
+import com.moko.lib.scannerui.dialog.AlertMessageDialog;
 import com.moko.lib.scannerui.utils.ToastUtils;
 import com.moko.mkmini0232d.AppConstants;
 import com.moko.mkmini0232d.R;
@@ -35,6 +36,7 @@ import com.moko.mkmini0232d.adapter.ScanDeviceAdapter;
 import com.moko.mkmini0232d.base.BaseActivity;
 import com.moko.mkmini0232d.databinding.ActivityDetailMini0232dBinding;
 import com.moko.mkmini0232d.db.DBTools;
+import com.moko.mkmini0232d.dialog.FilterTestDialog;
 import com.moko.mkmini0232d.entity.MQTTConfig;
 import com.moko.mkmini0232d.entity.MokoDevice;
 import com.moko.mkmini0232d.utils.SPUtiles;
@@ -63,6 +65,9 @@ public class DeviceDetailActivity extends BaseActivity<ActivityDetailMini0232dBi
     private final List<String> mScanDevices = new LinkedList<>();
     private Handler mHandler;
     private BeaconInfo mConnectedBeaconInfo;
+
+//    private int mPacketCount;
+//    private boolean mTestStart;
 
     @Override
     protected void onCreate() {
@@ -98,6 +103,7 @@ public class DeviceDetailActivity extends BaseActivity<ActivityDetailMini0232dBi
         mBind.tvScanDeviceTotal.setText(getString(R.string.scan_device_total, mScanDevices.size()));
         mBind.tvManageDevices.setVisibility(mScanSwitch ? View.VISIBLE : View.GONE);
         mBind.rvDevices.setVisibility(mScanSwitch ? View.VISIBLE : View.GONE);
+//        mBind.tvFilterTest.setVisibility(mScanSwitch ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -140,6 +146,8 @@ public class DeviceDetailActivity extends BaseActivity<ActivityDetailMini0232dBi
                 return;
             for (JsonObject jsonObject : result.data) {
                 mScanDevices.add(0, jsonObject.toString());
+//                if (!mTestStart) continue;
+//                mPacketCount++;
             }
             mBind.tvScanDeviceTotal.setText(getString(R.string.scan_device_total, mScanDevices.size()));
             mAdapter.replaceData(mScanDevices);
@@ -177,6 +185,8 @@ public class DeviceDetailActivity extends BaseActivity<ActivityDetailMini0232dBi
                 }
             } else {
                 Intent intent = new Intent(this, BleManagerActivity.class);
+                if (mMokoDevice.deviceType == 0x71)
+                    intent = new Intent(this, BleManagerV2Activity.class);
                 intent.putExtra(AppConstants.EXTRA_KEY_DEVICE, mMokoDevice);
                 startActivity(intent);
             }
@@ -362,6 +372,7 @@ public class DeviceDetailActivity extends BaseActivity<ActivityDetailMini0232dBi
         mBind.tvScanDeviceTotal.setVisibility(mScanSwitch ? View.VISIBLE : View.GONE);
         mBind.tvScanDeviceTotal.setText(getString(R.string.scan_device_total, 0));
         mBind.rvDevices.setVisibility(mScanSwitch ? View.VISIBLE : View.GONE);
+//        mBind.tvFilterTest.setVisibility(mScanSwitch ? View.VISIBLE : View.GONE);
         mScanDevices.clear();
         mAdapter.replaceData(mScanDevices);
         mHandler.postDelayed(() -> {
@@ -386,6 +397,24 @@ public class DeviceDetailActivity extends BaseActivity<ActivityDetailMini0232dBi
         showLoadingProgressDialog();
         getBleConnectedList();
     }
+
+//    public void onFilterTest(View view) {
+//        if (isWindowLocked()) return;
+//        mPacketCount = 0;
+//        FilterTestDialog dialog = new FilterTestDialog();
+//        dialog.setOnFilterTestClicked((duration) -> {
+//            mTestStart = true;
+//            showLoadingProgressDialog();
+//            mHandler.postDelayed(() -> {
+//                dismissLoadingProgressDialog();
+//                mTestStart = false;
+//                AlertMessageDialog alertDialog = new AlertMessageDialog();
+//                alertDialog.setMessage(String.format("Count:%d", mPacketCount));
+//                alertDialog.show(getSupportFragmentManager());
+//            }, duration * 1000);
+//        });
+//        dialog.show(getSupportFragmentManager());
+//    }
 
     private void getBleConnectedList() {
         int msgId = MQTTConstants.READ_MSG_ID_BLE_CONNECTED_LIST;

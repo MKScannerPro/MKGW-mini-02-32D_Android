@@ -123,6 +123,27 @@ public class WifiSettingsActivity extends BaseActivity<ActivityWifiSettingsMimi0
         if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
             dismissLoadingProgressDialog();
         }
+        if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
+            OrderTaskResponse response = event.getResponse();
+            OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
+            byte[] value = response.responseValue;
+            if (orderCHAR == OrderCHAR.CHAR_PARAMS) {
+                int header = value[0] & 0xFF;// 0xEE
+                int cmd = value[2] & 0xFF;
+                if (header == 0xEE) {
+                    ParamsLongKeyEnum configKeyEnum = ParamsLongKeyEnum.fromParamKey(cmd);
+                    if (configKeyEnum == null) return;
+                    // write
+                    switch (configKeyEnum) {
+                        case KEY_WIFI_CA:
+                        case KEY_WIFI_CLIENT_CERT:
+                        case KEY_WIFI_CLIENT_KEY:
+                            ToastUtils.showToast(this, "Setup failed！");
+                            break;
+                    }
+                }
+            }
+        }
         if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
             OrderTaskResponse response = event.getResponse();
             OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
@@ -139,13 +160,47 @@ public class WifiSettingsActivity extends BaseActivity<ActivityWifiSettingsMimi0
                         }
                         if (flag == 0x01) {
                             // write
+                            // write
                             int result = value[4] & 0xFF;
                             switch (configKeyEnum) {
-                                case KEY_WIFI_CLIENT_KEY:
-                                case KEY_WIFI_CLIENT_CERT:
                                 case KEY_WIFI_CA:
-                                    if (result != 1) {
-                                        mSavedParamsError = true;
+                                    if (result != 1) mSavedParamsError = true;
+                                    if (mEAPTypeSelected != 2 && mBind.cbVerifyServer.isChecked()) {
+                                        if (mSavedParamsError) {
+                                            ToastUtils.showToast(this, "Setup failed！");
+                                        } else {
+                                            mIsSaved = true;
+                                            ToastUtils.showToast(this, "Setup succeed！");
+                                        }
+                                        return;
+                                    }
+                                    mBind.tvTitle.postDelayed(() -> {
+                                        showLoadingProgressDialog();
+                                        try {
+                                            MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setWifiClientCert(new File(mCertPath)));
+                                        } catch (Exception e) {
+                                            ToastUtils.showToast(WifiSettingsActivity.this, "File is missing");
+                                        }
+                                    }, 300);
+                                    break;
+                                case KEY_WIFI_CLIENT_CERT:
+                                    if (result != 1) mSavedParamsError = true;
+                                    mBind.tvTitle.postDelayed(() -> {
+                                        showLoadingProgressDialog();
+                                        try {
+                                            MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setWifiClientKey(new File(mKeyPath)));
+                                        } catch (Exception e) {
+                                            ToastUtils.showToast(WifiSettingsActivity.this, "File is missing");
+                                        }
+                                    }, 300);
+                                    break;
+                                case KEY_WIFI_CLIENT_KEY:
+                                    if (result != 1) mSavedParamsError = true;
+                                    if (mSavedParamsError) {
+                                        ToastUtils.showToast(this, "Setup failed！");
+                                    } else {
+                                        mIsSaved = true;
+                                        ToastUtils.showToast(this, "Setup succeed！");
                                     }
                                     break;
                             }
@@ -166,18 +221,25 @@ public class WifiSettingsActivity extends BaseActivity<ActivityWifiSettingsMimi0
                                 case KEY_WIFI_EAP_USERNAME:
                                 case KEY_WIFI_EAP_PASSWORD:
                                 case KEY_WIFI_EAP_DOMAIN_ID:
-                                case KEY_WIFI_EAP_VERIFY_SERVICE_ENABLE:
-                                case KEY_WIFI_PASSWORD:
                                 case KEY_NETWORK_IP_INFO:
+                                case KEY_WIFI_EAP_TYPE:
                                 case KEY_NETWORK_DHCP:
-                                    if (result != 1) {
-                                        mSavedParamsError = true;
+                                    if (result != 1) mSavedParamsError = true;
+                                    break;
+                                case KEY_WIFI_EAP_VERIFY_SERVICE_ENABLE:
+                                    if (result != 1) mSavedParamsError = true;
+                                    if (mEAPTypeSelected != 2 && !mBind.cbVerifyServer.isChecked()) {
+                                        if (mSavedParamsError) {
+                                            ToastUtils.showToast(this, "Setup failed！");
+                                        } else {
+                                            mIsSaved = true;
+                                            ToastUtils.showToast(this, "Setup succeed！");
+                                        }
                                     }
                                     break;
-                                case KEY_WIFI_EAP_TYPE:
-                                    if (result != 1) {
-                                        mSavedParamsError = true;
-                                    }
+                                case KEY_WIFI_PASSWORD:
+                                    if (result != 1) mSavedParamsError = true;
+
                                     if (mSavedParamsError) {
                                         ToastUtils.showToast(this, "Setup failed！");
                                     } else {
@@ -453,6 +515,12 @@ public class WifiSettingsActivity extends BaseActivity<ActivityWifiSettingsMimi0
             showLoadingProgressDialog();
             List<OrderTask> orderTasks = new ArrayList<>();
             orderTasks.add(OrderTaskAssembler.setWifiSecurityType(mSecuritySelected));
+            if (!wifiDhcpEnable) {
+                String[] ipInfo = getIpInfo();
+                orderTasks.add(OrderTaskAssembler.setNetworkIPInfo(ipInfo[0], ipInfo[1], ipInfo[2], ipInfo[3]));
+            }
+            orderTasks.add(OrderTaskAssembler.setNetworkDHCP(wifiDhcpEnable ? 1 : 0));
+            orderTasks.add(OrderTaskAssembler.setWifiEapType(mEAPTypeSelected));
             if (mSecuritySelected == 0) {
                 orderTasks.add(OrderTaskAssembler.setWifiSSID(ssid));
                 orderTasks.add(OrderTaskAssembler.setWifiPassword(password));
@@ -469,16 +537,10 @@ public class WifiSettingsActivity extends BaseActivity<ActivityWifiSettingsMimi0
                     orderTasks.add(OrderTaskAssembler.setWifiEapDomainId(domainId));
                     orderTasks.add(OrderTaskAssembler.getWifiEapVerifyServiceEnable());
                     orderTasks.add(OrderTaskAssembler.setWifiCA(new File(mCaPath)));
-                    orderTasks.add(OrderTaskAssembler.setWifiClientCert(new File(mCertPath)));
-                    orderTasks.add(OrderTaskAssembler.setWifiClientKey(new File(mKeyPath)));
+//                    orderTasks.add(OrderTaskAssembler.setWifiClientCert(new File(mCertPath)));
+//                    orderTasks.add(OrderTaskAssembler.setWifiClientKey(new File(mKeyPath)));
                 }
             }
-            if (!wifiDhcpEnable) {
-                String[] ipInfo = getIpInfo();
-                orderTasks.add(OrderTaskAssembler.setNetworkIPInfo(ipInfo[0], ipInfo[1], ipInfo[2], ipInfo[3]));
-            }
-            orderTasks.add(OrderTaskAssembler.setNetworkDHCP(wifiDhcpEnable ? 1 : 0));
-            orderTasks.add(OrderTaskAssembler.setWifiEapType(mEAPTypeSelected));
             MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         } catch (Exception e) {
             ToastUtils.showToast(this, "File is missing");

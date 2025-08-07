@@ -53,6 +53,8 @@ public class FilterBXPTagActivity extends BaseActivity<ActivityFilterBxpTagMini0
         String mqttConfigAppStr = SPUtiles.getStringValue(this, AppConstants.SP_KEY_MQTT_CONFIG_APP, "");
         appMqttConfig = new Gson().fromJson(mqttConfigAppStr, MQTTConfig.class);
         mAppTopic = TextUtils.isEmpty(appMqttConfig.topicPublish) ? mMokoDevice.topicSubscribe : appMqttConfig.topicPublish;
+        mBind.tvTitle.setText(mMokoDevice.deviceType != 0x70 ? "BXP- Tag/Sensor" : "BXP- Tag");
+        mBind.cbBxpTag.setText(mMokoDevice.deviceType != 0x70 ? "BXP- Tag/Sensor" : "BXP- Tag");
         mHandler = new Handler(Looper.getMainLooper());
         mHandler.postDelayed(() -> {
             dismissLoadingProgressDialog();

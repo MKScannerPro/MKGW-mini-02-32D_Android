@@ -72,14 +72,10 @@ public class BXPButtonInfoActivity extends BaseActivity<ActivityBxpButtonInfoMin
             alarmStatusStr = "Not triggered";
         } else {
             StringBuilder modeStr = new StringBuilder();
-            if ((mBeaconInfo.alarm_status & 0x01) == 0x01)
-                modeStr.append("1&");
-            if ((mBeaconInfo.alarm_status & 0x02) == 0x02)
-                modeStr.append("2&");
-            if ((mBeaconInfo.alarm_status & 0x04) == 0x04)
-                modeStr.append("3&");
-            if ((mBeaconInfo.alarm_status & 0x08) == 0x08)
-                modeStr.append("4&");
+            if ((mBeaconInfo.alarm_status & 0x01) == 0x01) modeStr.append("1&");
+            if ((mBeaconInfo.alarm_status & 0x02) == 0x02) modeStr.append("2&");
+            if ((mBeaconInfo.alarm_status & 0x04) == 0x04) modeStr.append("3&");
+            if ((mBeaconInfo.alarm_status & 0x08) == 0x08) modeStr.append("4&");
             String mode = modeStr.substring(0, modeStr.length() - 1);
             alarmStatusStr = String.format("Mode %s triggered", mode);
         }
@@ -121,8 +117,7 @@ public class BXPButtonInfoActivity extends BaseActivity<ActivityBxpButtonInfoMin
         // 更新所有设备的网络状态
         final String topic = event.getTopic();
         final String message = event.getMessage();
-        if (TextUtils.isEmpty(message))
-            return;
+        if (TextUtils.isEmpty(message)) return;
         int msg_id;
         try {
             JsonObject object = new Gson().fromJson(message, JsonObject.class);
@@ -140,8 +135,7 @@ public class BXPButtonInfoActivity extends BaseActivity<ActivityBxpButtonInfoMin
                 Type type = new TypeToken<MsgNotify<BeaconInfo>>() {
                 }.getType();
                 MsgNotify<BeaconInfo> result = new Gson().fromJson(message, type);
-                if (!mMokoDevice.mac.equalsIgnoreCase(result.device_info.mac))
-                    return;
+                if (!mMokoDevice.mac.equalsIgnoreCase(result.device_info.mac)) return;
                 BeaconInfo bxpButtonInfo = result.data;
                 if (bxpButtonInfo.result_code != 0) {
                     ToastUtils.showToast(this, "Setup failed");
@@ -157,14 +151,10 @@ public class BXPButtonInfoActivity extends BaseActivity<ActivityBxpButtonInfoMin
                     alarmStatusStr = "Not triggered";
                 } else {
                     StringBuilder modeStr = new StringBuilder();
-                    if ((bxpButtonInfo.alarm_status & 0x01) == 0x01)
-                        modeStr.append("1&");
-                    if ((bxpButtonInfo.alarm_status & 0x02) == 0x02)
-                        modeStr.append("2&");
-                    if ((bxpButtonInfo.alarm_status & 0x04) == 0x04)
-                        modeStr.append("3&");
-                    if ((bxpButtonInfo.alarm_status & 0x08) == 0x08)
-                        modeStr.append("4&");
+                    if ((bxpButtonInfo.alarm_status & 0x01) == 0x01) modeStr.append("1&");
+                    if ((bxpButtonInfo.alarm_status & 0x02) == 0x02) modeStr.append("2&");
+                    if ((bxpButtonInfo.alarm_status & 0x04) == 0x04) modeStr.append("3&");
+                    if ((bxpButtonInfo.alarm_status & 0x08) == 0x08) modeStr.append("4&");
                     String mode = modeStr.substring(0, modeStr.length() - 1);
                     alarmStatusStr = String.format("Mode %s triggered", mode);
                 }
@@ -178,8 +168,7 @@ public class BXPButtonInfoActivity extends BaseActivity<ActivityBxpButtonInfoMin
                 Type type = new TypeToken<MsgNotify<BeaconInfo>>() {
                 }.getType();
                 MsgNotify<BeaconInfo> result = new Gson().fromJson(message, type);
-                if (!mMokoDevice.mac.equalsIgnoreCase(result.device_info.mac))
-                    return;
+                if (!mMokoDevice.mac.equalsIgnoreCase(result.device_info.mac)) return;
                 BeaconInfo bxpButtonInfo = result.data;
                 if (bxpButtonInfo.result_code != 0) {
                     ToastUtils.showToast(this, "Setup failed");
@@ -194,16 +183,14 @@ public class BXPButtonInfoActivity extends BaseActivity<ActivityBxpButtonInfoMin
                 getBXPButtonStatus();
             });
         }
-        if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_BUTTON_DISCONNECTED
-                || msg_id == MQTTConstants.CONFIG_MSG_ID_BLE_DISCONNECT) {
+        if (msg_id == MQTTConstants.NOTIFY_MSG_ID_BLE_BXP_BUTTON_DISCONNECTED || msg_id == MQTTConstants.CONFIG_MSG_ID_BLE_DISCONNECT) {
             runOnUiThread(() -> {
                 dismissLoadingProgressDialog();
                 mHandler.removeMessages(0);
                 Type type = new TypeToken<MsgNotify<JsonObject>>() {
                 }.getType();
                 MsgNotify<JsonObject> result = new Gson().fromJson(message, type);
-                if (!mMokoDevice.mac.equalsIgnoreCase(result.device_info.mac))
-                    return;
+                if (!mMokoDevice.mac.equalsIgnoreCase(result.device_info.mac)) return;
                 ToastUtils.showToast(this, "Bluetooth disconnect");
                 finish();
             });
@@ -232,8 +219,7 @@ public class BXPButtonInfoActivity extends BaseActivity<ActivityBxpButtonInfoMin
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDeviceOnlineEvent(DeviceOnlineEvent event) {
         String mac = event.getMac();
-        if (!mMokoDevice.mac.equals(mac))
-            return;
+        if (!mMokoDevice.mac.equals(mac)) return;
         boolean online = event.isOnline();
         if (!online) {
             ToastUtils.showToast(this, "device is off-line");
@@ -255,11 +241,8 @@ public class BXPButtonInfoActivity extends BaseActivity<ActivityBxpButtonInfoMin
 
     private final ActivityResultLauncher<Intent> startBeaconDFU = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_OK && null != result.getData()) {
-            int code = result.getData().getIntExtra("code", 0);
-            if (code != 3) {
-                ToastUtils.showToast(this, "Bluetooth disconnect");
-                finish();
-            }
+            ToastUtils.showToast(this, "Bluetooth disconnect");
+            finish();
         }
     });
 

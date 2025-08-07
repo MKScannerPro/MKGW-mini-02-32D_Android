@@ -678,6 +678,7 @@ public class ParamsTask extends OrderTask {
             }
         }
         inputSteam.close();
+        response.responseValue = data;
     }
 
     public void setFilterNameRules(ArrayList<String> filterNameRules) {

@@ -72,8 +72,8 @@ public class DeviceConfigActivity extends BaseActivity<ActivityDeviceConfigMini0
         mHandler = new Handler(Looper.getMainLooper());
         mBind.tvScannerFilter.setVisibility(mSelectedDeviceType == 0x70 ? View.VISIBLE : View.GONE);
         mBind.tvAdvIbeacon.setVisibility(mSelectedDeviceType == 0x70 ? View.VISIBLE : View.GONE);
-        mBind.tvScanAndUpload.setVisibility(mSelectedDeviceType == 0x71 ? View.GONE : View.VISIBLE);
-        mBind.tvAdvSettings.setVisibility(mSelectedDeviceType == 0x71 ? View.GONE : View.VISIBLE);
+        mBind.tvScanAndUpload.setVisibility(mSelectedDeviceType == 0x70 ? View.GONE : View.VISIBLE);
+        mBind.tvAdvSettings.setVisibility(mSelectedDeviceType == 0x70 ? View.GONE : View.VISIBLE);
     }
 
     @Override
@@ -193,7 +193,7 @@ public class DeviceConfigActivity extends BaseActivity<ActivityDeviceConfigMini0
         }.getType();
         MsgNotify<Object> msgNotify = new Gson().fromJson(message, type);
         final String mac = msgNotify.device_info.mac;
-        if (!mDeviceMqttConfig.staMac.equals(mac)) {
+        if (mDeviceMqttConfig == null || !mDeviceMqttConfig.staMac.equals(mac)) {
             return;
         }
         if (donutProgress == null) return;

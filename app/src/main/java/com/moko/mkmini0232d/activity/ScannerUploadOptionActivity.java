@@ -129,7 +129,7 @@ public class ScannerUploadOptionActivity extends BaseActivity<ActivityScannerUpl
             if (!mMokoDevice.mac.equalsIgnoreCase(result.device_info.mac)) return;
             phySelected = result.data.get("phy_filter").getAsInt();
             mBind.tvFilterPhy.setText(phyArr[phySelected]);
-            if (mMokoDevice.deviceType != 0) {
+            if (mMokoDevice.deviceType != 0x70) {
                 getDuplicateDataFilter();
                 return;
             }
@@ -167,7 +167,7 @@ public class ScannerUploadOptionActivity extends BaseActivity<ActivityScannerUpl
             }.getType();
             MsgConfigResult<?> result = new Gson().fromJson(message, type);
             if (!mMokoDevice.mac.equalsIgnoreCase(result.device_info.mac)) return;
-            if (mMokoDevice.deviceType != 0) {
+            if (mMokoDevice.deviceType != 0x70) {
                 setDuplicateDataFilter();
                 return;
             }

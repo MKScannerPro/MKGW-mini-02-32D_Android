@@ -57,6 +57,10 @@ public class ModifyWifiSettingsActivity extends BaseActivity<ActivityModifyWifiS
 
     @Override
     protected void onCreate() {
+        mBind.cbVerifyServer.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (mSecuritySelected != 0 && mEAPTypeSelected != 2)
+                mBind.clCa.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+        });
         String IP_REGEX = "((25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))\\.){3}(25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))*";
         pattern = Pattern.compile(IP_REGEX);
         InputFilter filter = (source, start, end, dest, dstart, dend) -> {
