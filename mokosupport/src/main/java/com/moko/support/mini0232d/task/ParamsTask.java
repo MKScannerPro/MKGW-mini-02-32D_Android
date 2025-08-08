@@ -1,5 +1,8 @@
 package com.moko.support.mini0232d.task;
 
+import android.text.TextUtils;
+
+import com.elvishew.xlog.XLog;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.mini0232d.MokoSupport;
@@ -11,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 
 import androidx.annotation.IntRange;
 
@@ -735,6 +739,7 @@ public class ParamsTask extends OrderTask {
                 data[i + 6] = dataBytes[i];
             }
         }
+        response.responseValue = data;
     }
 
     public void setLongChar(ParamsLongKeyEnum key, String character) {
@@ -775,6 +780,7 @@ public class ParamsTask extends OrderTask {
                 data[i + 6] = dataBytes[i];
             }
         }
+        response.responseValue = data;
     }
 
     private int packetCount;
@@ -790,8 +796,7 @@ public class ParamsTask extends OrderTask {
     public boolean parseValue(byte[] value) {
         final int header = value[0] & 0xFF;
         final int flag = value[1] & 0xFF;
-        if (header == 0xED)
-            return true;
+        if (header == 0xED) return true;
         if (flag == 0x01) {
             final int cmd = value[2] & 0xFF;
             final int result = value[4] & 0xFF;
@@ -966,5 +971,32 @@ public class ParamsTask extends OrderTask {
                 (byte) 0x01,
                 (byte) enable
         };
+    }
+
+    private int retryCount = 0;
+
+    @Override
+    public boolean timeoutPreTask() {
+        retryCount++;
+        if (retryCount < 3) {
+            if (data != null && data.length > 4) {
+                String keyCmd = "";
+                if ((data[0] & 0xFF) == 0xED) {
+                    ParamsKeyEnum keyEnum = ParamsKeyEnum.fromParamKey(data[2] & 0xFF);
+                    keyCmd = keyEnum != null ? keyEnum.name() : "";
+                }
+                if ((data[0] & 0xFF) == 0xEE) {
+                    ParamsLongKeyEnum keyEnum = ParamsLongKeyEnum.fromParamKey(data[2] & 0xFF);
+                    keyCmd = keyEnum != null ? keyEnum.name() : "";
+                }
+                if (!TextUtils.isEmpty(keyCmd)) {
+                    XLog.i(String.format(Locale.getDefault(), "%s Timeout,Retry index----%d", keyCmd, retryCount));
+                    MokoSupport.getInstance().executeTask();
+                    return false;
+                }
+            }
+        }
+        retryCount = 0;
+        return super.timeoutPreTask();
     }
 }

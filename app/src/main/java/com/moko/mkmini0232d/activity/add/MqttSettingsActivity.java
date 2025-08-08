@@ -163,12 +163,20 @@ public class MqttSettingsActivity extends BaseActivity<ActivityMqttDeviceMini023
                     if (configKeyEnum == null) return;
                     // write
                     switch (configKeyEnum) {
+                        case KEY_MQTT_USERNAME:
+                        case KEY_MQTT_PASSWORD:
+                            mSavedParamsError = true;
+                            break;
                         case KEY_MQTT_CA:
                         case KEY_MQTT_CLIENT_CERT:
                         case KEY_MQTT_CLIENT_KEY:
                             ToastUtils.showToast(this, "Setup failed！");
                             break;
                     }
+                } else if (header == 0xED) {
+                    ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
+                    if (configKeyEnum == null) return;
+                    mSavedParamsError = true;
                 }
             }
         }
@@ -192,9 +200,7 @@ public class MqttSettingsActivity extends BaseActivity<ActivityMqttDeviceMini023
                             switch (configKeyEnum) {
                                 case KEY_MQTT_USERNAME:
                                 case KEY_MQTT_PASSWORD:
-                                    if (result != 1) {
-                                        mSavedParamsError = true;
-                                    }
+                                    if (result != 1) mSavedParamsError = true;
                                     break;
                                 case KEY_MQTT_CA:
                                     if (result != 1) mSavedParamsError = true;
@@ -215,6 +221,7 @@ public class MqttSettingsActivity extends BaseActivity<ActivityMqttDeviceMini023
                                             ToastUtils.showToast(MqttSettingsActivity.this, "File is missing");
                                         }
                                     }, 300);
+                                    break;
                                 case KEY_MQTT_CLIENT_KEY:
                                     if (result != 1) mSavedParamsError = true;
                                     mBind.title.postDelayed(() -> {
@@ -225,6 +232,7 @@ public class MqttSettingsActivity extends BaseActivity<ActivityMqttDeviceMini023
                                             ToastUtils.showToast(MqttSettingsActivity.this, "File is missing");
                                         }
                                     }, 300);
+                                    break;
                                 case KEY_MQTT_CLIENT_CERT:
                                     if (result != 1) mSavedParamsError = true;
                                     if (mSavedParamsError) {
@@ -274,26 +282,31 @@ public class MqttSettingsActivity extends BaseActivity<ActivityMqttDeviceMini023
                                 case KEY_MQTT_LWT_QOS:
                                 case KEY_MQTT_LWT_TOPIC:
                                 case KEY_MQTT_LWT_PAYLOAD:
-                                    if (result != 1) {
-                                        mSavedParamsError = true;
-                                    }
+                                    if (result != 1) mSavedParamsError = true;
                                     break;
                                 case KEY_MQTT_CONNECT_MODE:
-                                    if (result != 1) {
-                                        mSavedParamsError = true;
-                                    }
+                                    if (result != 1) mSavedParamsError = true;
                                     if (mSavedParamsError) {
                                         ToastUtils.showToast(this, "Setup failed！");
                                     } else {
-                                        mIsSaved = true;
-                                        ToastUtils.showToast(this, "Setup succeed！");
+                                        if (mqttDeviceConfig.connectMode < 2) {
+                                            mIsSaved = true;
+                                            ToastUtils.showToast(this, "Setup succeed！");
+                                        } else {
+                                            mBind.title.postDelayed(() -> {
+                                                showLoadingProgressDialog();
+                                                try {
+                                                    MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setCA(new File(mqttDeviceConfig.caPath)));
+                                                } catch (Exception e) {
+                                                    ToastUtils.showToast(MqttSettingsActivity.this, "File is missing");
+                                                }
+                                            }, 300);
+                                        }
+                                        break;
                                     }
-                                    break;
                             }
-                        }
-                        if (flag == 0x00) {
-                            if (length == 0)
-                                return;
+                        } else if (flag == 0x00) {
+                            if (length == 0) return;
                             // read
                             switch (configKeyEnum) {
                                 case KEY_MQTT_CONNECT_MODE:
@@ -504,6 +517,7 @@ public class MqttSettingsActivity extends BaseActivity<ActivityMqttDeviceMini023
     }
 
     private void setMQTTDeviceConfig() {
+        mSavedParamsError = false;
         try {
             showLoadingProgressDialog();
             ArrayList<OrderTask> orderTasks = new ArrayList<>();
@@ -525,10 +539,6 @@ public class MqttSettingsActivity extends BaseActivity<ActivityMqttDeviceMini023
             orderTasks.add(OrderTaskAssembler.setMqttUserName(mqttDeviceConfig.username));
             orderTasks.add(OrderTaskAssembler.setMqttPassword(mqttDeviceConfig.password));
             orderTasks.add(OrderTaskAssembler.setMqttConnectMode(mqttDeviceConfig.connectMode));
-            if (mqttDeviceConfig.connectMode >= 2) {
-                File file = new File(mqttDeviceConfig.caPath);
-                orderTasks.add(OrderTaskAssembler.setCA(file));
-            }
             MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         } catch (Exception e) {
             ToastUtils.showToast(this, "File is missing");
