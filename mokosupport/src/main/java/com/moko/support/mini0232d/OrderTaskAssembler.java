@@ -3,7 +3,6 @@ package com.moko.support.mini0232d;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.support.mini0232d.entity.ParamsKeyEnum;
 import com.moko.support.mini0232d.entity.ParamsLongKeyEnum;
-import com.moko.support.mini0232d.task.GetFirmwareRevisionTask;
 import com.moko.support.mini0232d.task.GetHardwareRevisionTask;
 import com.moko.support.mini0232d.task.GetManufacturerNameTask;
 import com.moko.support.mini0232d.task.GetModelNumberTask;

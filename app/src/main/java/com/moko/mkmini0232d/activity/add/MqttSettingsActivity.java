@@ -7,12 +7,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.RadioGroup;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.IdRes;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager2.widget.ViewPager2;
-
 import com.elvishew.xlog.XLog;
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -20,20 +14,20 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
+import com.moko.lib.scannerui.dialog.AlertMessageDialog;
+import com.moko.lib.scannerui.utils.ToastUtils;
 import com.moko.mkmini0232d.AppConstants;
 import com.moko.mkmini0232d.R;
 import com.moko.mkmini0232d.activity.MainActivityMiNi0232D;
 import com.moko.mkmini0232d.adapter.MQTTFragmentAdapter;
 import com.moko.mkmini0232d.base.BaseActivity;
 import com.moko.mkmini0232d.databinding.ActivityMqttDeviceMini0232dBinding;
-import com.moko.lib.scannerui.dialog.AlertMessageDialog;
 import com.moko.mkmini0232d.entity.MQTTConfig;
 import com.moko.mkmini0232d.fragment.GeneralDeviceFragment;
 import com.moko.mkmini0232d.fragment.LWTFragment;
 import com.moko.mkmini0232d.fragment.SSLDeviceFragment;
 import com.moko.mkmini0232d.fragment.UserDeviceFragment;
 import com.moko.mkmini0232d.utils.FileUtils;
-import com.moko.lib.scannerui.utils.ToastUtils;
 import com.moko.mkmini0232d.utils.Utils;
 import com.moko.support.mini0232d.MokoSupport;
 import com.moko.support.mini0232d.OrderTaskAssembler;
@@ -55,6 +49,12 @@ import java.io.File;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.IdRes;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
 
 public class MqttSettingsActivity extends BaseActivity<ActivityMqttDeviceMini0232dBinding> implements RadioGroup.OnCheckedChangeListener {
     private final String FILTER_ASCII = "[ -~]*";

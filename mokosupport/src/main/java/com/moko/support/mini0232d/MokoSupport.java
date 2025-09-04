@@ -15,7 +15,6 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.mini0232d.entity.OrderCHAR;
-import com.moko.support.mini0232d.entity.ParamsKeyEnum;
 import com.moko.support.mini0232d.entity.ParamsLongKeyEnum;
 import com.moko.support.mini0232d.handler.MokoCharacteristicHandler;
 

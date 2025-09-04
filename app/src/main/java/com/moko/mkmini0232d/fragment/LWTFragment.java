@@ -7,11 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.moko.lib.scannerui.utils.ToastUtils;
+import com.moko.mkmini0232d.databinding.FragmentLwtMini0232dBinding;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
-import com.moko.mkmini0232d.databinding.FragmentLwtMini0232dBinding;
-import com.moko.lib.scannerui.utils.ToastUtils;
 
 public class LWTFragment extends Fragment {
     private final String FILTER_ASCII = "[ -~]*";

@@ -5,12 +5,12 @@ import android.net.Uri;
 import android.view.View;
 
 import com.moko.ble.lib.utils.MokoUtils;
+import com.moko.lib.mqtt.event.MQTTConnectionCompleteEvent;
+import com.moko.lib.scannerui.utils.ToastUtils;
 import com.moko.mkmini0232d.R;
 import com.moko.mkmini0232d.base.BaseActivity;
 import com.moko.mkmini0232d.databinding.ActivityAboutBinding;
-import com.moko.lib.scannerui.utils.ToastUtils;
 import com.moko.mkmini0232d.utils.Utils;
-import com.moko.lib.mqtt.event.MQTTConnectionCompleteEvent;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;

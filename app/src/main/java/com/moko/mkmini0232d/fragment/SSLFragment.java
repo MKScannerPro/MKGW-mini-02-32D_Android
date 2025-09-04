@@ -7,19 +7,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.moko.lib.scannerui.dialog.BottomDialog;
+import com.moko.lib.scannerui.utils.ToastUtils;
+import com.moko.mkmini0232d.R;
+import com.moko.mkmini0232d.databinding.FragmentSslAppMini0232dBinding;
+import com.moko.mkmini0232d.utils.FileUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
-import com.moko.mkmini0232d.R;
-import com.moko.mkmini0232d.databinding.FragmentSslAppMini0232dBinding;
-import com.moko.lib.scannerui.dialog.BottomDialog;
-import com.moko.mkmini0232d.utils.FileUtils;
-import com.moko.lib.scannerui.utils.ToastUtils;
-
-import java.io.File;
-import java.util.ArrayList;
 
 public class SSLFragment extends Fragment {
     public static final int REQUEST_CODE_SELECT_CA = 0x10;

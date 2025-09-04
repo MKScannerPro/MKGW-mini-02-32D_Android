@@ -18,7 +18,6 @@ import com.moko.lib.scannerui.utils.ToastUtils;
 import com.moko.mkmini0232d.AppConstants;
 import com.moko.mkmini0232d.R;
 import com.moko.mkmini0232d.activity.MainActivityMiNi0232D;
-import com.moko.mkmini0232d.activity.MainActivityMiNi0232D;
 import com.moko.mkmini0232d.adapter.AlarmEventDataAdapter;
 import com.moko.mkmini0232d.base.BaseActivity;
 import com.moko.mkmini0232d.databinding.ActivityAlarmEventDataMini0232dBinding;

@@ -37,8 +37,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import androidx.viewbinding.ViewBinding;
-
 public class BXPSAdvParamsActivity extends BaseActivity<ActivityBxpSAdvParamsMini0232dBinding> {
     private MokoDevice mMokoDevice;
     private MQTTConfig appMqttConfig;

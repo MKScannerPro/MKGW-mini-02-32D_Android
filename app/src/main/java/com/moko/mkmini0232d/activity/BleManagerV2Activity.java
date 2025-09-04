@@ -23,7 +23,6 @@ import com.moko.lib.scannerui.utils.ToastUtils;
 import com.moko.mkmini0232d.AppConstants;
 import com.moko.mkmini0232d.activity.beacon.BXPBCRActivity;
 import com.moko.mkmini0232d.activity.beacon.BXPBDActivity;
-import com.moko.mkmini0232d.activity.beacon.BXPButtonInfoActivity;
 import com.moko.mkmini0232d.activity.beacon.BXPCActivity;
 import com.moko.mkmini0232d.activity.beacon.BXPDActivity;
 import com.moko.mkmini0232d.activity.beacon.BXPSActivity;
