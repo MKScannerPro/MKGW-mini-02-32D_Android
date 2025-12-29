@@ -45,7 +45,7 @@ public class UploadDataOptionActivity extends BaseActivity<ActivityUploadDataOpt
         mAppTopic = TextUtils.isEmpty(appMqttConfig.topicPublish) ? mMokoDevice.topicSubscribe : appMqttConfig.topicPublish;
 
         mBind.cbRawDataAdv.setText(mMokoDevice.deviceType == 0x70 ? "RAW Data-Advertising" : "RAW Data");
-        mBind.llRawDataRsp.setVisibility(mMokoDevice.deviceType == 0x70 ? View.VISIBLE : View.GONE);
+        mBind.cbRawDataRsp.setText(mMokoDevice.deviceType == 0x70? "RAW Data-Response" : "Parsed data");
 
         mHandler = new Handler(Looper.getMainLooper());
         mHandler.postDelayed(() -> {
@@ -84,6 +84,8 @@ public class UploadDataOptionActivity extends BaseActivity<ActivityUploadDataOpt
             mBind.cbRawDataAdv.setChecked(result.data.get("adv_data").getAsInt() == 1);
             if (mMokoDevice.deviceType == 0x70)
                 mBind.cbRawDataRsp.setChecked(result.data.get("rsp_data").getAsInt() == 1);
+            else
+                mBind.cbRawDataRsp.setChecked(result.data.get("parse_adv_data").getAsInt() == 1);
         }
         if (msg_id == MQTTConstants.CONFIG_MSG_ID_UPLOAD_DATA_OPTION) {
             Type type = new TypeToken<MsgConfigResult<?>>() {
@@ -116,6 +118,8 @@ public class UploadDataOptionActivity extends BaseActivity<ActivityUploadDataOpt
         jsonObject.addProperty("adv_data", mBind.cbRawDataAdv.isChecked() ? 1 : 0);
         if (mMokoDevice.deviceType == 0x70)
             jsonObject.addProperty("rsp_data", mBind.cbRawDataRsp.isChecked() ? 1 : 0);
+        else
+            jsonObject.addProperty("parse_adv_data", mBind.cbRawDataRsp.isChecked() ? 1 : 0);
         String message = assembleWriteCommonData(msgId, mMokoDevice.mac, jsonObject);
         try {
             MQTTSupport.getInstance().publish(mAppTopic, message, msgId, appMqttConfig.qos);
