@@ -51,6 +51,7 @@ public class FilterRawDataSwitchActivity extends BaseActivity<ActivityFilterRawD
         appMqttConfig = new Gson().fromJson(mqttConfigAppStr, MQTTConfig.class);
         mAppTopic = TextUtils.isEmpty(appMqttConfig.topicPublish) ? mMokoDevice.topicSubscribe : appMqttConfig.topicPublish;
 
+        mBind.rlFilterByNano.setVisibility(mMokoDevice.deviceType != 0x70 ? View.VISIBLE : View.GONE);
         mBind.tvFilterByBxpTagTitle.setText(mMokoDevice.deviceType != 0x70 ? "BXP - Tag/Sensor" : "BXP - Tag");
 
         mHandler = new Handler(Looper.getMainLooper());
