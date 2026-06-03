@@ -65,10 +65,11 @@ public class DeviceConfigActivity extends BaseActivity<ActivityDeviceConfigMini0
 
     @Override
     protected void onCreate() {
-        mSelectedDeviceType = getIntent().getIntExtra(AppConstants.EXTRA_KEY_SELECTED_DEVICE_TYPE, 0x70);
+        mSelectedDeviceType = getIntent().getIntExtra(AppConstants.EXTRA_KEY_SELECTED_DEVICE_TYPE, 0x10);
         mIsFirstConfig = getIntent().getBooleanExtra(AppConstants.EXTRA_KEY_FIRST_CONFIG, false);
         String mqttConfigAppStr = SPUtiles.getStringValue(this, AppConstants.SP_KEY_MQTT_CONFIG_APP, "");
-        mAppMqttConfig = new Gson().fromJson(mqttConfigAppStr, MQTTConfig.class);
+        if (!TextUtils.isEmpty(mqttConfigAppStr))
+            mAppMqttConfig = new Gson().fromJson(mqttConfigAppStr, MQTTConfig.class);
         mHandler = new Handler(Looper.getMainLooper());
         mBind.tvScannerFilter.setVisibility(mSelectedDeviceType == 0x70 ? View.VISIBLE : View.GONE);
         mBind.tvAdvIbeacon.setVisibility(mSelectedDeviceType == 0x70 ? View.VISIBLE : View.GONE);
@@ -104,6 +105,7 @@ public class DeviceConfigActivity extends BaseActivity<ActivityDeviceConfigMini0
         if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
             OrderTaskResponse response = event.getResponse();
             OrderCHAR orderCHAR = (OrderCHAR) response.orderCHAR;
+            int responseType = response.responseType;
             byte[] value = response.responseValue;
             if (orderCHAR == OrderCHAR.CHAR_PARAMS) {
                 if (value.length >= 4) {
@@ -123,6 +125,18 @@ public class DeviceConfigActivity extends BaseActivity<ActivityDeviceConfigMini0
                                 if (result != 1) {
                                     ToastUtils.showToast(this, "Setup failed！");
                                 } else {
+                                    if (!MQTTSupport.getInstance().isConnected()) {
+                                        isSettingSuccess = true;
+                                        AlertMessageDialog dialog = new AlertMessageDialog();
+                                        dialog.setMessage("Configurations are successfully sent to gateway.");
+                                        dialog.setCancelGone();
+                                        dialog.setOnAlertConfirmListener(() -> {
+                                            Intent modifyIntent = new Intent(DeviceConfigActivity.this, MainActivityMiNi0232D.class);
+                                            startActivity(modifyIntent);
+                                        });
+                                        dialog.show(getSupportFragmentManager());
+                                        return;
+                                    }
                                     if (!mIsFirstConfig) {
                                         if (mIsMQTTConfigFinished)
                                             subscribeTopic();
@@ -250,7 +264,7 @@ public class DeviceConfigActivity extends BaseActivity<ActivityDeviceConfigMini0
         MokoSupport.getInstance().disConnectBle();
     }
 
-    public void onAdvertiseIBeacon(View view) {
+    public void onAdvertiseIBeacon(View view){
         if (isWindowLocked()) return;
         startActivity(new Intent(this, AdvertiseIBeaconActivity.class));
     }
@@ -263,8 +277,7 @@ public class DeviceConfigActivity extends BaseActivity<ActivityDeviceConfigMini0
 
     public void onWifiSettings(View view) {
         if (isWindowLocked()) return;
-        Intent intent;
-        intent = new Intent(this, WifiSettingsActivity.class);
+        Intent intent = new Intent(this, WifiSettingsActivity.class);
         intent.putExtra(AppConstants.EXTRA_KEY_BEACON_TYPE, mSelectedDeviceType);
         intent.putExtra(AppConstants.EXTRA_KEY_FIRST_CONFIG, mIsFirstConfig);
         startWIFISettings.launch(intent);
@@ -288,12 +301,13 @@ public class DeviceConfigActivity extends BaseActivity<ActivityDeviceConfigMini0
         startActivity(intent);
     }
 
+
+
     public void onScanAndUpload(View view) {
         if (isWindowLocked()) return;
         Intent intent = new Intent(this, ScanAndUploadActivity.class);
         startActivity(intent);
     }
-
 
     public void onDeviceInfo(View view) {
         if (isWindowLocked()) return;
@@ -304,6 +318,10 @@ public class DeviceConfigActivity extends BaseActivity<ActivityDeviceConfigMini0
 
     public void onConnect(View view) {
         if (isWindowLocked()) return;
+        if (!MQTTSupport.getInstance().isConnected()) {
+            showExitConfigModeDialog();
+            return;
+        }
         if (!mIsFirstConfig) {
             AlertMessageDialog dialog = new AlertMessageDialog();
             dialog.setMessage("New settings are applying to device, device is connecting to network and MQTT");
@@ -324,16 +342,30 @@ public class DeviceConfigActivity extends BaseActivity<ActivityDeviceConfigMini0
         MokoSupport.getInstance().sendOrder(OrderTaskAssembler.exitConfigMode());
     }
 
+    private void showExitConfigModeDialog() {
+        AlertMessageDialog dialog = new AlertMessageDialog();
+        dialog.setMessage("APP connects to the MQTT broker failed,do you need continue to send configurations to gateway?");
+        dialog.setConfirm("YES");
+        dialog.setCancel("NO");
+        dialog.setOnAlertConfirmListener(() -> {
+            if (!mIsWIFIConfigFinished || !mIsMQTTConfigFinished) {
+                ToastUtils.showToast(this, "Please configure WIFI and MQTT settings first!");
+                return;
+            }
+            showLoadingProgressDialog();
+            MokoSupport.getInstance().sendOrder(OrderTaskAssembler.exitConfigMode());
+        });
+        dialog.show(getSupportFragmentManager());
+    }
+
     private final ActivityResultLauncher<Intent> startWIFISettings = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (null != result && result.getResultCode() == RESULT_OK)
+        if (result.getResultCode() == RESULT_OK)
             mIsWIFIConfigFinished = true;
     });
     private final ActivityResultLauncher<Intent> startMQTTSettings = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (null != result && result.getResultCode() == RESULT_OK) {
-            if (null != result.getData()) {
-                mIsMQTTConfigFinished = true;
-                mDeviceMqttConfig = (MQTTConfig) result.getData().getSerializableExtra(AppConstants.EXTRA_KEY_MQTT_CONFIG_DEVICE);
-            }
+        if (result.getResultCode() == RESULT_OK) {
+            mIsMQTTConfigFinished = true;
+            mDeviceMqttConfig = (MQTTConfig) result.getData().getSerializableExtra(AppConstants.EXTRA_KEY_MQTT_CONFIG_DEVICE);
         }
     });
     private int progress;
@@ -357,7 +389,7 @@ public class DeviceConfigActivity extends BaseActivity<ActivityDeviceConfigMini0
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    XLog.e(e);
+                    e.printStackTrace();
                 }
                 progress++;
             }
@@ -367,10 +399,22 @@ public class DeviceConfigActivity extends BaseActivity<ActivityDeviceConfigMini0
                 isDeviceConnectSuccess = true;
                 isSettingSuccess = false;
                 dismissConnMqttDialog();
-                ToastUtils.showToast(DeviceConfigActivity.this, getString(R.string.mqtt_connecting_timeout));
-                finish();
+//                ToastUtils.showToast(DeviceConfigActivity.this, getString(R.string.mqtt_connecting_timeout));
+//                finish();
+                showReceiveFailedDialog();
             }
         }, 90 * 1000);
+    }
+
+    private void showReceiveFailedDialog() {
+        AlertMessageDialog dialog = new AlertMessageDialog();
+        dialog.setMessage("The APP is unable to subscribe messages from the gateway. This may be caused by the failure connection with MQTT broker of the gateway or an incorrect subscription topic set for the APP.");
+        dialog.setConfirm("OK");
+        dialog.setCancelGone();
+        dialog.setOnAlertConfirmListener(() -> {
+            finish();
+        });
+        dialog.show(getSupportFragmentManager());
     }
 
     private void dismissConnMqttDialog() {
@@ -389,7 +433,7 @@ public class DeviceConfigActivity extends BaseActivity<ActivityDeviceConfigMini0
                 MQTTSupport.getInstance().subscribe(mDeviceMqttConfig.topicPublish, mAppMqttConfig.qos);
             }
         } catch (MqttException e) {
-            XLog.e(e);
+            e.printStackTrace();
         }
         // 订阅遗愿主题
         try {
@@ -399,7 +443,7 @@ public class DeviceConfigActivity extends BaseActivity<ActivityDeviceConfigMini0
                 MQTTSupport.getInstance().subscribe(mDeviceMqttConfig.lwtTopic, mAppMqttConfig.qos);
             }
         } catch (MqttException e) {
-            XLog.e(e);
+            e.printStackTrace();
         }
     }
 }

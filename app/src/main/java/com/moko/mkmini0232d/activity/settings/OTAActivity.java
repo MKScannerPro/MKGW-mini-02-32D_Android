@@ -94,8 +94,8 @@ public class OTAActivity extends BaseActivity<ActivityOtaMini0232dBinding> {
             XLog.i("升级固件");
             mHandler.postDelayed(() -> {
                 dismissLoadingProgressDialog();
-                ToastUtils.showToast(this, "Set up failed");
-            }, 50 * 1000);
+                ToastUtils.showToast(this, "Update timeout");
+            }, 100 * 1000);
             showLoadingProgressDialog();
             setOTA(firmwareFileUrlStr, otaType == 0 ? MQTTConstants.CONFIG_MSG_ID_OTA : MQTTConstants.CONFIG_MSG_ID_OTA_BLE);
         }
