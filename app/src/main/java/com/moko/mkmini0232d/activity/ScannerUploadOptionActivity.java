@@ -82,7 +82,8 @@ public class ScannerUploadOptionActivity extends BaseActivity<ActivityScannerUpl
         mRelationshipValues.add("MAC&ADV name&Raw data");
         mRelationshipValues.add("ADV name | Raw data");
         mRelationshipValues.add("ADV NAME & MAC");
-        mRelationshipValues.add("MAC/ADV name/Raw data");
+        if (mMokoDevice.deviceType != 0x70)
+            mRelationshipValues.add("MAC/ADV name/Raw data");
         mHandler.postDelayed(() -> {
             dismissLoadingProgressDialog();
             finish();
