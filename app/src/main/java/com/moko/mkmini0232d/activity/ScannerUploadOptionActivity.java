@@ -51,7 +51,7 @@ public class ScannerUploadOptionActivity extends BaseActivity<ActivityScannerUpl
     public Handler mHandler;
     private ArrayList<String> mRelationshipValues;
     private int mRelationshipSelected;
-    private final String[] phyArr = {"1M PHY(V4.2)", "1M PHY(V5.0)", "1M PHY(V4.2) & 1M PHY(V5.0)", "Coded PHY(V5.0)", "1M PHY&Coded PHY(V5.0)"};
+    private ArrayList<String> mPhyValues;
     private int phySelected;
     private int mDuplicateDataSelected;
     private final String[] mDuplicateDataValues = {"Disable", "MAC", "MAC+DATA TYPE", "MAC+RAW DATA"};
@@ -84,6 +84,13 @@ public class ScannerUploadOptionActivity extends BaseActivity<ActivityScannerUpl
         mRelationshipValues.add("ADV NAME & MAC");
         if (mMokoDevice.deviceType != 0x70)
             mRelationshipValues.add("MAC/ADV name/Raw data");
+        mPhyValues = new ArrayList<>();
+        mPhyValues.add("1M PHY(V4.2)");
+        mPhyValues.add("1M PHY(V5.0)");
+        mPhyValues.add("1M PHY(V4.2) & 1M PHY(V5.0)");
+        mPhyValues.add("Coded PHY(V5.0)");
+        if (mMokoDevice.deviceType != 0x70)
+            mPhyValues.add("1M PHY&Coded PHY(V5.0)");
         mHandler.postDelayed(() -> {
             dismissLoadingProgressDialog();
             finish();
@@ -141,7 +148,7 @@ public class ScannerUploadOptionActivity extends BaseActivity<ActivityScannerUpl
             MsgReadResult<JsonObject> result = new Gson().fromJson(message, type);
             if (!mMokoDevice.mac.equalsIgnoreCase(result.device_info.mac)) return;
             phySelected = result.data.get("phy_filter").getAsInt();
-            mBind.tvFilterPhy.setText(phyArr[phySelected]);
+            mBind.tvFilterPhy.setText(mPhyValues.get(phySelected));
             if (mMokoDevice.deviceType != 0x70) {
                 getDuplicateDataFilter();
                 return;
@@ -227,10 +234,10 @@ public class ScannerUploadOptionActivity extends BaseActivity<ActivityScannerUpl
     private void onFilterPhyClick() {
         if (isWindowLocked()) return;
         BottomDialog dialog = new BottomDialog();
-        dialog.setDatas(new ArrayList<>(Arrays.asList(phyArr)), phySelected);
+        dialog.setDatas(mPhyValues, phySelected);
         dialog.setListener(value -> {
             phySelected = value;
-            mBind.tvFilterPhy.setText(phyArr[value]);
+            mBind.tvFilterPhy.setText(mPhyValues.get(value));
         });
         dialog.show(getSupportFragmentManager());
     }
@@ -376,6 +383,7 @@ public class ScannerUploadOptionActivity extends BaseActivity<ActivityScannerUpl
         });
         dialog.show(getSupportFragmentManager());
     }
+
     public void onScanMode(View view) {
         if (isWindowLocked())
             return;
@@ -387,6 +395,7 @@ public class ScannerUploadOptionActivity extends BaseActivity<ActivityScannerUpl
         });
         dialog.show(getSupportFragmentManager());
     }
+
     public void onDuplicateDataFilter(View view) {
         start(DuplicateDataFilterActivity.class);
     }
